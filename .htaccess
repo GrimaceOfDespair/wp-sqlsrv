@@ -1,0 +1,4 @@
+Options +FollowSymlinks
+RewriteEngine on
+
+RewriteRule setup-config.php ../wp-content/mu-plugins/wp-db-abstraction/setup-config [PT,L]

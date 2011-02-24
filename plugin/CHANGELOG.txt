@@ -1,0 +1,65 @@
+== 1.0.0 - 2/23/2011 ==
+
+ * Changed from patch to plugin architecture.  Drivers and translation files moved
+   to mu-plugins/wp-db-abstraction, created plugin file with filter for api ping
+   hook, wp-db.php became db.php drop in, no longer touching any core files
+
+ * Changed name of project
+
+ * Incorporated several fixes from sourceforge forums in T-SQL dialect translations
+
+ * New README
+
+== beta 0.9.4 - 10/12/2010 ==
+
+ * Turning off verify_insert and verify_update verification methods.
+ * Fixing some undefined var notices.
+ * Translation for CHAR_LENGTH and LENGTH functions to LEN
+
+== beta 0.9.3 - 8/09/2010 ==
+
+ * Translation fixes for the "The data types ntext and varchar are incompatible in the less than operator" errors
+ * Tweaking the schema data types created to use nvarchar as opposed to deprecated text fields
+ * Doing much more extensive testing with a Selenium test suite we have created to test wordpress and wordpress with our patch.
+   This resulted in some fine tuning and translation fixes to provide for a more robust version of the patch.
+
+== beta 0.9.2 - 6/18/2010 ==
+
+ * restructured drivers and translation files to remove duplicate translation files
+ * PDO connection tweak for newest PHP SQL Server Driver release. Needs server= in DSN  
+
+== beta 0.9.1 - 6/11/2010 ==
+
+ * Tweak to driver prepare function to better catched serialized arguments
+ * Adding missing has_cap functions in drivers files
+ * Fixing install driver drop down list bug
+ * Fixing an issue where database conn is lost with particular plugin queries
+
+== beta 0.9.0 - 6/2/2010 ==
+
+ * Forcing use of ntext and nvarchar for all text/varchar columns...all insert/update queries prepend N to these columns.
+   This always for special characters...such as cryllic text if russian version of blog is installed.
+ * No longer including modified config-sample.php in patch as it was colliding with WPLANG when different lang versions are wanted.
+ * Fixed a bug where certain fields weren't having their comparison operators changed to LIKE/NOT LIKE ... 
+   and switched the code that handles this to use some regex.
+ 
+== beta 0.8.9 - 5/21/2010 ==
+
+ * Fixed regex for COUNT() as Computed to allow for any COUNT param
+ * PDO driver support (pdo_mysql and pdo_sqlsrv)
+
+== beta 0.8.8 - 4/13/2010 ==
+
+ * Fixed issue with REPLACE() needing the field in param 1 to be cast as nvarchar(max). 
+   This presented itself when importing wordpress import files with download attachments checked
+ * Fixed regex in translate_incompat_data_type to properly check for negative integers. This error presented itself when editing posts.
+ * Fixed single quote issue where single quotes where being double quoted and resulted in posts with ' in the content changing to '' . 
+   It turns out that despite wordpress' docblock about not escaping before the db layer escape function, it does a lot of escaping for posts 
+   before the insert. With mysql it isn't noticeable as they are using mysql_real_escape_string, but we are doing a str_replace(). Instead of
+   Changing more files so that these initial escapes don't happen, I've added some code in the fix_results() to perform the opposite str_replace
+   for text fields.
+
+== beta 0.8.7 4/6/2010 ==
+
+ * Providing for wordpress upgrade process, by pinging our own external site to handle patched distributions of WP upgrades.
+ * Initial import/export support.

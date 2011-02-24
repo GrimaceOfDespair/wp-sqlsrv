@@ -1,0 +1,133 @@
+## Config/Installation
+ * setup_config
+   - incorrect_config_fields
+   - correct_config_fields
+ * blog_install
+   - incorrect_install_fields
+   - correct_install_fields
+
+## Admin UI
+ * User Related
+   - login (done)
+   - logout
+   - add_user (done)
+   - delete_user (done)
+   - edit_user
+   - bulk_delete
+   - search_users
+   - filter_users
+ * Super Admin
+   - admin_search_users (done)
+   - admin_search_sites (done)
+   - add_site
+   - edit_site
+   - delete_site
+   - add_user (done)
+   - edit_user (done)
+   - delete_user (done)
+   - enabled_theme (done)
+   - disable_theme (done)
+   - edit_options
+   - update_network
+ * Dashboard
+   - view_dashboard (done)
+ * Posts
+   - view_posts (done)
+   - add_category (done)
+   - add_post (done)
+   - add_tag (done)
+   - assign_category
+   - assign_tag
+   - delete_category (done)
+   - delete_post (done)
+   - delete_tag (done)
+   - edit_post (done)
+   - edit_tag (done)
+   - edit_category (done)
+   - move_page_to_trash (done)
+   - move_post_to_trash (done)
+ * Media
+   - view_media_library (done)
+   - upload_media
+   - delete_media
+   - attach_media
+ * Links
+   - view_links (done)
+   - add_link (done)
+   - edit_link (done)
+   - delete_link (done)
+   - view_link_categories (done)
+   - add_link_category (done)
+   - edit_link_category (done)
+   - delete_link_category (done)
+ * Pages
+   - view_pages (done)
+   - add_page (done)
+   - edit_page (done)
+   - delete_page (done)
+ * Comments
+   - view_comments (done)
+   - trash_comment (done)
+   - delete_comment (done)
+   - mark_comment_spam (done)
+   - mark_comment_unapproved (done)
+   - mark_comment_approved (done)
+   - restore_comment (done)
+ * Appearance
+   - view_themes (done)
+   - enable_theme
+   - disable_theme
+   - set_active_widget
+   - set_inactive_widget
+   - add_menu
+   - edit_menu
+   - delete_menu
+   - edit_custom_background (done)
+   - edit_header (done)
+   - edit_template
+ * Plugins
+   - view_plugins (done)
+   - activate_plugin (done)
+   - deactivate_plugin (done)
+   - update_plugin
+   - delete_plugin
+   - add_plugin
+   - edit_plugin
+ * Users
+   - view_users (done)
+   - view_administrators (done)
+   - edit_profile (done)
+ * Tools
+   - import_wordpress_import_file
+   - export_wordpress
+   - network
+ * Settings
+   - edit_general_settings (done)
+   - edit_reading_settings (done)
+   - edit_writing_settings (done)
+   - edit_dicussion_settings (done)
+   - edit_media_settings (done)
+   - edit_privacy_settings (done)
+   - edit_permalinks_settings (done)
+## Frontend Site Tests
+ * Content
+   - view_main_blog_listing
+   - search
+   - archives
+   - categories
+   - calendar
+   - view post
+   - view page
+   - view rss
+ * Comments
+   - register (done)
+   - log in (done)
+   - log out (done)
+   - reset password (done)
+   - edit profile (done)
+   - comment post anonymous (done)
+   - comment post logged in (done)
+   - comment page anonymous (done)
+   - comment page logged in (done)
+   - view comments post
+   - view comments page

@@ -1,0 +1,24 @@
+Wordpress PHPUnit Test Suite
+
+Good testing suites contain two types of tests
+  1. Unit Tests - testing the actual code in isolated blocks
+  2. System Tests - also known as Acceptance Testing, tests how everything fits together and functions a whole
+
+Currently the test suite contains only System Tests (in the /system directory)
+These require
+  1. phpUnit
+  2. Testing_Selenium
+  3. Selenium RC
+  4. A wordpress install accessible via the browser on the system where you are
+     running the tests
+
+Although these tests may be run on a local or remote install of wordpress and
+try to leave the system in the same state as the tests began, it is always smart
+to back up your database first.  In fact it may be beneficial and is recommended
+that you run this on a clean database install.
+
+TO WRITE: how to enable the query logging during system testing
+
+Code coverage can be enabled for the tests if you have the xdebug extension installed.
+You may enable it via passing the correct arguments to the command line or by
+uncommenting information in the phpunit.xml file
