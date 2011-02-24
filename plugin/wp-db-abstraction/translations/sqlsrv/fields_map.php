@@ -36,7 +36,7 @@ class Fields_map
 	 */
 	function __construct()
 	{
-		$this->filepath = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp-content/fields_map.parsed_types.php';
+	    $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.php';
 	}
 
     /**
