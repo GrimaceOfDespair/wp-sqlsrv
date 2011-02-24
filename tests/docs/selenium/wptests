@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+  <title>Test Suite</title>
+</head>
+<body>
+<table id="suiteTable" cellpadding="1" cellspacing="1" border="1" class="selenium"><tbody>
+<tr><td><b>Test Suite</b></td></tr>
+<tr><td><a href="add_post">add_post</a></td></tr>
+<tr><td><a href="edit_post">edit_post</a></td></tr>
+<tr><td><a href="move_post_to_trash">move_post_to_trash</a></td></tr>
+<tr><td><a href="delete_post">delete_post</a></td></tr>
+<tr><td><a href="add_tag">add_tag</a></td></tr>
+<tr><td><a href="assign_tag">assign_tag</a></td></tr>
+<tr><td><a href="add_category">add_category</a></td></tr>
+<tr><td><a href="assign_category">assign_category</a></td></tr>
+<tr><td><a href="delete_category">delete_category</a></td></tr>
+<tr><td><a href="delete_tag">delete_tag</a></td></tr>
+<tr><td><a href="add_link">add_link</a></td></tr>
+<tr><td><a href="edit_link">edit_link</a></td></tr>
+<tr><td><a href="delete_link">delete_link</a></td></tr>
+<tr><td><a href="add_page">add_page</a></td></tr>
+<tr><td><a href="edit_page">edit_page</a></td></tr>
+<tr><td><a href="move_page_to_trash">move_page_to_trash</a></td></tr>
+<tr><td><a href="delete_page">delete_page</a></td></tr>
+<tr><td><a href="setting_general_change">setting_general_change</a></td></tr>
+<tr><td><a href="setting_writing_change">setting_writing_change</a></td></tr>
+</tbody></table>
+</body>
+</html>

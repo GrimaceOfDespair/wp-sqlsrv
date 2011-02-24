@@ -1,0 +1,1 @@
+phpunit suite/TestSuite.php

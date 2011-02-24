@@ -1,0 +1,22 @@
+    <testsuites>
+        <testsuite name="System Tests for Wordpress">
+            <directory>suite</directory>
+        </testsuite>
+    </testsuites>
+<!-- Uncomment this block to enable code coverage or add additional loggers
+    <logging>
+        <log type="coverage-html" target="output/report" charset="UTF-8"
+            yui="true" highlight="false"
+            lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-xml" target="test/output/coverage.xml"/>
+    </logging>
+-->
+<!-- Uncomment this block to configure selenium
+    <selenium>
+      <browser name="Firefox on Linux"
+               browser="*firefox /usr/lib/firefox/firefox-bin"
+               host="my.linux.box"
+               port="4444"
+               timeout="30000"/>
+    </selenium>
+-->

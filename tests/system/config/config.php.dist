@@ -1,0 +1,35 @@
+<?php
+class Tests_System_Config
+{
+    // This is information for selenium screenshots on failure
+    public $captureScreenshotOnFailure = TRUE;
+    public $screenshotPath = '/../output';
+    public $screenshotUrl = 'http://localhost/tests/system/suite/output';
+
+    // actual wordpress instance we're testing
+    public $wordpressUrl  = 'http://localhost/wordpress/';
+    public $wordpressPath = '/var/www/wordpress/';
+
+    // query log path
+    public $queryLogPath = '/../output/logs/';
+
+    // front end "user" to test with
+    public $wordpressUser = 'test';
+    public $wordpressPass = 'testing';
+
+    // superadministrator to test with
+    public $wordpressAdminUser = 'test';
+    public $wordpressAdminPass = 'testing';
+
+    // browser information
+    public $browser = array(
+        'name'    => 'Firefox on Linux',
+        'browser' => '*firefox /usr/lib/firefox/firefox-bin',
+        'host'    => 'my.linux.box',
+        'port'    => 4444,
+        'timeout' => 30000
+    );
+
+    public $isMultiuser = false;
+
+}

@@ -1,0 +1,23 @@
+Testing:
+Selenium tests should be runnable on an in use system without damage.
+That is it inserts and cleans up after itself without side effects.  Not that
+it's ever really a good idea to run tests without a backup, and the results would
+always be cleaner on a fresh db.  However the option should still exist.
+
+Unit tests:
+Port the well written unit tests from old testing suite. Not all should or will
+be moved over and many new tests will be required.
+
+Additional Integration and support:
+  1. Netbeans integration
+  2. Eclipse integration
+
+Both of these IDEs have build in Selenium and PHPUnit support, hooking into their
+run systems would make users of these IDEs very happy.
+
+System Testing Tools:
+There are a number of helper tools which would be nice to create at some point.
+
+  1. Command line configuration file creator
+  2. DB only installation helper
+  3. New install installation helper
