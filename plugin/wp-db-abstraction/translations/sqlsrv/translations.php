@@ -36,8 +36,8 @@ class SQL_Translations
      * @var bool
      */
     var $update_query = false;
-	
-	/**
+    
+    /**
      * Select query?
      *
      * @since 2.7.1
@@ -45,8 +45,8 @@ class SQL_Translations
      * @var bool
      */
     var $select_query = false;
-	
-	/**
+    
+    /**
      * Create query?
      *
      * @since 2.7.1
@@ -54,8 +54,8 @@ class SQL_Translations
      * @var bool
      */
     var $create_query = false;
-	
-	/**
+    
+    /**
      * Alter query?
      *
      * @since 2.7.1
@@ -72,7 +72,7 @@ class SQL_Translations
      * @var bool
      */
     var $insert_query = false;
-	
+    
     /**
      * Delete query?
      *
@@ -99,8 +99,8 @@ class SQL_Translations
      * @var array
      */
     var $update_data = array();
-	
-	/**
+    
+    /**
      * Limit Info
      *
      * @since 2.7.1
@@ -117,60 +117,60 @@ class SQL_Translations
      * @var array
      */
     var $translation_changes = array();
-	
-	/**
+    
+    /**
      * Azure
-	 * Are we dealing with a SQL Azure DB?
+     * Are we dealing with a SQL Azure DB?
      *
      * @since 2.7.1
      * @access public
      * @var bool
      */
     var $azure = false;
-	
-	/**
-	 * Preceeding query
-	 * Sometimes we need to issue a query
-	 * before the original query 
-	 *
-	 * @since 2.8.5
-	 * @access public
-	 * @var mixed
-	 */
-	var $preceeding_query = false;
-	
-	/**
-	 * Following query
-	 * Sometimes we need to issue a query
-	 * right after the original query 
-	 *
-	 * @since 2.8.5
-	 * @access public
-	 * @var mixed
-	 */
-	var $following_query = false;
-	
-	/**
-	 * Should we verify update/insert queries?
-	 *
-	 * @since 2.8.5
-	 * @access public
-	 * @var mixed
-	 */
-	var $verify = false;
-	
-    	/**
-	 * WordPress table prefix
-	 *
-	 * You can set this to have multiple WordPress installations
-	 * in a single database. The second reason is for possible
-	 * security precautions.
-	 *
-	 * @since 0.71
-	 * @access private
-	 * @var string
-	 */
-	var $prefix = '';
+    
+    /**
+     * Preceeding query
+     * Sometimes we need to issue a query
+     * before the original query 
+     *
+     * @since 2.8.5
+     * @access public
+     * @var mixed
+     */
+    var $preceeding_query = false;
+    
+    /**
+     * Following query
+     * Sometimes we need to issue a query
+     * right after the original query 
+     *
+     * @since 2.8.5
+     * @access public
+     * @var mixed
+     */
+    var $following_query = false;
+    
+    /**
+     * Should we verify update/insert queries?
+     *
+     * @since 2.8.5
+     * @access public
+     * @var mixed
+     */
+    var $verify = false;
+    
+        /**
+     * WordPress table prefix
+     *
+     * You can set this to have multiple WordPress installations
+     * in a single database. The second reason is for possible
+     * security precautions.
+     *
+     * @since 0.71
+     * @access private
+     * @var string
+     */
+    var $prefix = '';
 
     /**
      * php4 style call to constructor.
@@ -180,20 +180,20 @@ class SQL_Translations
      */
     function SQL_Translations()
     {
-		return $this->__construct();
+        return $this->__construct();
     }
-	
-	/**
-	 * Assign fields_map as a new Fields_map object
-	 *
-	 * PHP5 style constructor for compatibility with PHP5.
-	 *
-	 * @since 2.7.1
-	 */
-	function __construct()
-	{
-		$this->fields_map = new Fields_map();
-	}
+    
+    /**
+     * Assign fields_map as a new Fields_map object
+     *
+     * PHP5 style constructor for compatibility with PHP5.
+     *
+     * @since 2.7.1
+     */
+    function __construct()
+    {
+        $this->fields_map = new Fields_map();
+    }
 
     /**
      * MySQL > MSSQL Query Translation
@@ -207,12 +207,12 @@ class SQL_Translations
      */
     function translate($query)
     {
-		$this->limit = array();
-		
-		$this->set_query_type(trim($query));
-		
-		$this->preceeding_query = false;
-		$this->following_query = false;
+        $this->limit = array();
+        
+        $this->set_query_type(trim($query));
+        
+        $this->preceeding_query = false;
+        $this->following_query = false;
 
         // Was this query prepared?
         if ( strripos($query, '--PREPARE') !== FALSE ) {
@@ -225,24 +225,24 @@ class SQL_Translations
         // Do we have serialized arguments?
         if ( strripos($query, '--SERIALIZED') !== FALSE ) {
             $query = str_replace('--SERIALIZED', '', $query);
-			if ($this->insert_query) {
-				$query = $this->on_duplicate_key($query);
-			}
+            if ($this->insert_query) {
+                $query = $this->on_duplicate_key($query);
+            }
             $query = $this->translate_general($query);
             return $query;
         }
 
-		$query = trim($query);
+        $query = trim($query);
 
         $sub_funcs = array(
             'translate_general',
             'translate_date_add',
             'translate_if_stmt',
             'translate_sqlcalcrows',
-			'translate_limit',
+            'translate_limit',
             'translate_now_datetime',
             'translate_distinct_orderby',
-			'translate_replace_casting',
+            'translate_replace_casting',
             'translate_sort_casting',
             'translate_column_type',
             'translate_remove_groupby',
@@ -264,7 +264,7 @@ class SQL_Translations
             }
         }
         if ( $this->insert_query ) {
-			$query = $this->on_duplicate_key($query);
+            $query = $this->on_duplicate_key($query);
             $query = $this->split_insert_values($query);
         }
         if ( $this->prepared && $this->insert_query && $this->verify ) {
@@ -283,30 +283,30 @@ class SQL_Translations
 
         return $query;
     }
-	
-	function set_query_type($query)
-	{
-		$this->insert_query = false;
-		$this->delete_query = false;
-		$this->update_query = false;
-		$this->select_query = false;
-		$this->alter_query  = false;
-		$this->create_query = false;
-		
-		if ( stripos($query, 'INSERT') === 0 ) {
+    
+    function set_query_type($query)
+    {
+        $this->insert_query = false;
+        $this->delete_query = false;
+        $this->update_query = false;
+        $this->select_query = false;
+        $this->alter_query  = false;
+        $this->create_query = false;
+        
+        if ( stripos($query, 'INSERT') === 0 ) {
             $this->insert_query = true;
-		} else if ( stripos($query, 'SELECT') === 0 ) {
+        } else if ( stripos($query, 'SELECT') === 0 ) {
             $this->select_query = true;
-		} else if ( stripos($query, 'DELETE') === 0 ) {
+        } else if ( stripos($query, 'DELETE') === 0 ) {
             $this->delete_query = true;
-		} else if ( stripos($query, 'UPDATE') === 0 ) {
+        } else if ( stripos($query, 'UPDATE') === 0 ) {
             $this->update_query = true;
         } else if ( stripos($query, 'ALTER') === 0 ) {
             $this->alter_query = true;
         } else if ( stripos($query, 'CREATE') === 0 ) {
             $this->create_query = true;
         }
-	}
+    }
 
     /**
      * More generalized information gathering queries
@@ -352,21 +352,21 @@ class SQL_Translations
             $param = "'". trim($param, "'") . "'";
             $query = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ' . $param;
         }
-		
-		// SHOW INDEXES - issue with sql azure trying to fix....sys.sysindexes is coming back as invalid onject name
-		if ( stripos($query, 'SHOW INDEXES FROM ') === 0 ) {
-			return $query;
-			$table = substr($query, 18);
-			$query = "SELECT sys.sysindexes.name AS IndexName
-					  FROM sysobjects
-				       JOIN sys.key_constraints ON parent_object_id = sys.sysobjects.id
-				       JOIN sys.sysindexes ON sys.sysindexes.id = sys.sysobjects.id and sys.key_constraints.unique_index_id = sys.sysindexes.indid
-				       JOIN sys.index_columns ON sys.index_columns.object_id = sys.sysindexes.id  and sys.index_columns.index_id = sys.sysindexes.indid
-				       JOIN sys.syscolumns ON sys.syscolumns.id = sys.sysindexes.id AND sys.index_columns.column_id = sys.syscolumns.colid
-					  WHERE sys.sysobjects.type = 'u'	
-					   AND sys.sysobjects.name = '{$table}'";
-		}
-		
+        
+        // SHOW INDEXES - issue with sql azure trying to fix....sys.sysindexes is coming back as invalid onject name
+        if ( stripos($query, 'SHOW INDEXES FROM ') === 0 ) {
+            return $query;
+            $table = substr($query, 18);
+            $query = "SELECT sys.sysindexes.name AS IndexName
+                      FROM sysobjects
+                       JOIN sys.key_constraints ON parent_object_id = sys.sysobjects.id
+                       JOIN sys.sysindexes ON sys.sysindexes.id = sys.sysobjects.id and sys.key_constraints.unique_index_id = sys.sysindexes.indid
+                       JOIN sys.index_columns ON sys.index_columns.object_id = sys.sysindexes.id  and sys.index_columns.index_id = sys.sysindexes.indid
+                       JOIN sys.syscolumns ON sys.syscolumns.id = sys.sysindexes.id AND sys.index_columns.column_id = sys.syscolumns.colid
+                      WHERE sys.sysobjects.type = 'u'   
+                       AND sys.sysobjects.name = '{$table}'";
+        }
+        
         // USE INDEX
         if ( stripos($query, 'USE INDEX (') !== FALSE) {
             $start_pos = stripos($query, 'USE INDEX (');
@@ -388,16 +388,16 @@ class SQL_Translations
             $params = implode(',', $params);
             $query = substr_replace($query, 'WITH (INDEX(' . $params . '))', $start_pos, ($end_pos + 1) - $start_pos);
         }
-		
-		// DESCRIBE - this is pretty darn close to mysql equiv, however it will need to have a flag to modify the result set
-		// this and SHOW INDEX FROM are used in WP upgrading. The problem is that WP will see the different data types and try
-		// to alter the table thinking an upgrade is necessary. So the result set from this query needs to be modified using
-		// the field_mapping to revert column types back to their mysql equiv to fool WP.
-		if ( stripos($query, 'DESCRIBE ') === 0 ) {
-			return $query;
-			$table = substr($query, 9);
-			$query = $this->describe($table);
-		}
+        
+        // DESCRIBE - this is pretty darn close to mysql equiv, however it will need to have a flag to modify the result set
+        // this and SHOW INDEX FROM are used in WP upgrading. The problem is that WP will see the different data types and try
+        // to alter the table thinking an upgrade is necessary. So the result set from this query needs to be modified using
+        // the field_mapping to revert column types back to their mysql equiv to fool WP.
+        if ( stripos($query, 'DESCRIBE ') === 0 ) {
+            return $query;
+            $table = substr($query, 9);
+            $query = $this->describe($table);
+        }
 
         // DROP TABLES
         if ( stripos($query, 'DROP TABLE IF EXISTS ') === 0 ) {
@@ -426,8 +426,8 @@ class SQL_Translations
         // avoiding some nested as Computed issues
         if (stristr($query, 'SELECT COUNT(DISTINCT(' . $this->prefix . 'users.ID))') !== FALSE) {
             $query = str_ireplace(
-				'SELECT COUNT(DISTINCT(' . $this->prefix . 'users.ID))', 
-				'SELECT COUNT(DISTINCT(' . $this->prefix . 'users.ID)) as Computed', $query);
+                'SELECT COUNT(DISTINCT(' . $this->prefix . 'users.ID))', 
+                'SELECT COUNT(DISTINCT(' . $this->prefix . 'users.ID)) as Computed', $query);
         }
         
         if (!preg_match('/CHAR_LENGTH\((.*?)\) as/i', $query)) {
@@ -453,65 +453,65 @@ class SQL_Translations
         // Remove uncessary ORDER BY clauses as ORDER BY fields needs to 
         // be contained in either an aggregate function or the GROUP BY clause.
         // something that isn't enforced in mysql
-		if (preg_match('/SELECT COUNT\((.*?)\) as Computed FROM/i', $query)) {
-			$order_pos = stripos($query, 'ORDER BY');
-			if ($order_pos !== false) {
-			    $query = substr($query, 0, $order_pos);
-			}
-		}
-		
-		// Turn on IDENTITY_INSERT for Importing inserts or category/tag adds that are 
-		// trying to explicitly set and IDENTITY column
-		if ($this->insert_query) {
-			$tables = array(
-				$this->get_blog_prefix() . 'posts' => 'id', 
-				$this->get_blog_prefix() . 'terms' => 'term_id', 
-			);
-			foreach ($tables as $table => $pid) {
-				if (stristr($query, 'INTO ' . $table) !== FALSE) {
-					$strlen = strlen($table);
-					$start_pos = stripos($query, $table) + $strlen;
-					$start_pos = stripos($query, '(', $start_pos);
-					$end_pos = $this->get_matching_paren($query, $start_pos + 1);
-					$params = substr($query, $start_pos + 1, $end_pos - ($start_pos + 1));
-					$params = explode(',', $params);
-					$found = false;
-					foreach ($params as $k => $v) {
-						if (strtolower($v) === $pid) {
-							$found = true;
-						}	
-					}
-					
-					if ($found) {
-						$this->preceeding_query = "SET IDENTITY_INSERT $table ON";
-						$this->following_query = "SET IDENTITY_INSERT $table OFF";
-					}
-				}
-			}
-		}
-		
-		// UPDATE queries trying to change an IDENTITY column this happens
-		// for cat/tag adds (WPMU) e.g. UPDATE wp_1_terms SET term_id = 5 WHERE term_id = 3330
-		if ($this->update_query) {
-			$tables = array(
-				$this->prefix . 'terms' => 'term_id', 
-			);
-			foreach ($tables as $table => $pid) {
-				if (stristr($query, $table . ' SET ' . $pid) !== FALSE) {
-					preg_match_all("^=\s\d+^", $query, $matches);
-					if (!empty($matches) && count($matches[0]) == 2) {
-						$to = trim($matches[0][0], '= ');
-						$from = trim($matches[0][1], '= ');
-						$this->preceeding_query = "SET IDENTITY_INSERT $table ON";
-						// find a better way to get columns (field mapping doesn't grab all)
-						$query = "INSERT INTO $table (term_id,name,slug,term_group) SELECT $to,name,slug,term_group FROM $table WHERE $pid = $from";
-						$this->following_query = array("DELETE $table WHERE $pid = $from","SET IDENTITY_INSERT $table OFF");
-						$this->verify = false;
-					}
-				}
-			}
-		}
-		
+        if (preg_match('/SELECT COUNT\((.*?)\) as Computed FROM/i', $query)) {
+            $order_pos = stripos($query, 'ORDER BY');
+            if ($order_pos !== false) {
+                $query = substr($query, 0, $order_pos);
+            }
+        }
+        
+        // Turn on IDENTITY_INSERT for Importing inserts or category/tag adds that are 
+        // trying to explicitly set and IDENTITY column
+        if ($this->insert_query) {
+            $tables = array(
+                $this->get_blog_prefix() . 'posts' => 'id', 
+                $this->get_blog_prefix() . 'terms' => 'term_id', 
+            );
+            foreach ($tables as $table => $pid) {
+                if (stristr($query, 'INTO ' . $table) !== FALSE) {
+                    $strlen = strlen($table);
+                    $start_pos = stripos($query, $table) + $strlen;
+                    $start_pos = stripos($query, '(', $start_pos);
+                    $end_pos = $this->get_matching_paren($query, $start_pos + 1);
+                    $params = substr($query, $start_pos + 1, $end_pos - ($start_pos + 1));
+                    $params = explode(',', $params);
+                    $found = false;
+                    foreach ($params as $k => $v) {
+                        if (strtolower($v) === $pid) {
+                            $found = true;
+                        }   
+                    }
+                    
+                    if ($found) {
+                        $this->preceeding_query = "SET IDENTITY_INSERT $table ON";
+                        $this->following_query = "SET IDENTITY_INSERT $table OFF";
+                    }
+                }
+            }
+        }
+        
+        // UPDATE queries trying to change an IDENTITY column this happens
+        // for cat/tag adds (WPMU) e.g. UPDATE wp_1_terms SET term_id = 5 WHERE term_id = 3330
+        if ($this->update_query) {
+            $tables = array(
+                $this->prefix . 'terms' => 'term_id', 
+            );
+            foreach ($tables as $table => $pid) {
+                if (stristr($query, $table . ' SET ' . $pid) !== FALSE) {
+                    preg_match_all("^=\s\d+^", $query, $matches);
+                    if (!empty($matches) && count($matches[0]) == 2) {
+                        $to = trim($matches[0][0], '= ');
+                        $from = trim($matches[0][1], '= ');
+                        $this->preceeding_query = "SET IDENTITY_INSERT $table ON";
+                        // find a better way to get columns (field mapping doesn't grab all)
+                        $query = "INSERT INTO $table (term_id,name,slug,term_group) SELECT $to,name,slug,term_group FROM $table WHERE $pid = $from";
+                        $this->following_query = array("DELETE $table WHERE $pid = $from","SET IDENTITY_INSERT $table OFF");
+                        $this->verify = false;
+                    }
+                }
+            }
+        }
+        
         return $query;
     }
 
@@ -574,12 +574,12 @@ class SQL_Translations
         }
         // catch the next query.
         if ( stripos($query, 'FOUND_ROWS()') > 0 ) {
-			$from_pos = stripos($this->previous_query, 'FROM');
-			$where_pos = stripos($this->previous_query, 'WHERE');
-			$from_str = trim(substr($this->previous_query, $from_pos, ($where_pos - $from_pos)));
-			$order_by_pos = stripos($this->previous_query, 'ORDER BY');
-			$where_str = trim(substr($this->previous_query, $where_pos, ($order_by_pos - $where_pos)));
-			$query = str_ireplace('FOUND_ROWS()', 'COUNT(1) as Computed ' . $from_str . ' ' . $where_str, $query);
+            $from_pos = stripos($this->previous_query, 'FROM');
+            $where_pos = stripos($this->previous_query, 'WHERE');
+            $from_str = trim(substr($this->previous_query, $from_pos, ($where_pos - $from_pos)));
+            $order_by_pos = stripos($this->previous_query, 'ORDER BY');
+            $where_str = trim(substr($this->previous_query, $where_pos, ($order_by_pos - $where_pos)));
+            $query = str_ireplace('FOUND_ROWS()', 'COUNT(1) as Computed ' . $from_str . ' ' . $where_str, $query);
         }
         return $query;
     }
@@ -608,20 +608,27 @@ class SQL_Translations
     (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%contributor%') as cd, 
     (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%subscriber%') as ce, 
     COUNT(*) as c FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities'";
-		} 
-		
+        } 
+        
         if (stristr($query, "SELECT DISTINCT TOP 50 (" . $this->prefix . "users.ID) FROM " . $this->prefix . "users") !== FALSE) {
             $query = str_ireplace(
-				"SELECT DISTINCT TOP 50 (" . $this->prefix . "users.ID) FROM", 
-				"SELECT DISTINCT TOP 50 (" . $this->prefix . "users.ID), user_login FROM", $query);
-		}
-   	    return $query;
+                "SELECT DISTINCT TOP 50 (" . $this->prefix . "users.ID) FROM", 
+                "SELECT DISTINCT TOP 50 (" . $this->prefix . "users.ID), user_login FROM", $query);
+        }
+        
+        if (stristr($query, 'INNER JOIN ' . $this->prefix . 'terms USING (term_id)') !== FALSE) {
+            $query = str_ireplace(
+                'USING (term_id)', 
+                'ON ' . $this->prefix . 'terms.term_id = ' . $this->prefix . 'term_taxonomy.term_id', $query);
+        }
+        
+        return $query;
     }
 
     /**
      * Changing LIMIT to TOP...mimicking offset while possible with rownum, it has turned
-	 * out to be very problematic as depending on the original query, the derived table
-	 * will have a lot of problems with columns names, ordering and what not. 
+     * out to be very problematic as depending on the original query, the derived table
+     * will have a lot of problems with columns names, ordering and what not. 
      *
      * @since 2.7.1
      *
@@ -665,10 +672,10 @@ class SQL_Translations
             $limit_matches[1] = (int) $limit_matches[1];
             $limit_matches[4] = (int) $limit_matches[4];
 
-			$this->limit = array(
-				'from' => $limit_matches[1], 
-				'to' => $limit_matches[4]
-			);
+            $this->limit = array(
+                'from' => $limit_matches[1], 
+                'to' => $limit_matches[4]
+            );
         }
         return $query;
     }
@@ -696,7 +703,7 @@ class SQL_Translations
             $as_array = $this->get_as_fields($query);
             if (empty($as_array)) {
                 $query = str_ireplace('FROM','as dom FROM',$query);
-				$query = str_ireplace('* as dom','*',$query);
+                $query = str_ireplace('* as dom','*',$query);
             }
         }
         return $query;
@@ -737,8 +744,8 @@ class SQL_Translations
         return $query;
     }
 
-	/**
-	 * To use REPLACE() fields need to be cast as varchar
+    /**
+     * To use REPLACE() fields need to be cast as varchar
      *
      * @since 2.7.1
      *
@@ -746,11 +753,11 @@ class SQL_Translations
      *
      * @return string Translated Query
      */
-	 function translate_replace_casting($query)
-	 {
-		$query = preg_replace('/REPLACE\((.*?),.*?(.*?),.*?(.*?)\)/i', 'REPLACE(cast(\1 as nvarchar(max)),cast(\2 as nvarchar(max)),cast(\3 as nvarchar(max)))', $query);
-		return $query;
-	 }
+     function translate_replace_casting($query)
+     {
+        $query = preg_replace('/REPLACE\((.*?),.*?(.*?),.*?(.*?)\)/i', 'REPLACE(cast(\1 as nvarchar(max)),cast(\2 as nvarchar(max)),cast(\3 as nvarchar(max)))', $query);
+        return $query;
+     }
 
     /**
      * To sort text fields they need to be first cast as varchar
@@ -871,47 +878,50 @@ class SQL_Translations
      */
     function translate_insert_nulltime($query)
     {
-        if ( !$this->insert_query ) {
-			return $query;
-		}
-		// Lets grab the fields to be inserted into and their position
-		// based on the csv.
-		$first_paren = stripos($query, '(', 11) + 1;
-		$last_paren = $this->get_matching_paren($query, $first_paren);
-		$fields = explode(',',substr($query, $first_paren, ($last_paren - $first_paren)));
-		$date_fields = array();
-		$date_fields_map = $this->fields_map->by_type('date');
-		foreach ($fields as $key => $field ) {
-			$field = trim($field);
 
-			if ( in_array($field, $date_fields_map) ) {
-				$date_fields[] = array('pos' => $key, 'field' => $field);
-			}
-		}
-		// we have date fields to check
-		if ( count($date_fields) > 0 ) {
-			// we need to get the values
-			$values_pos = stripos($query, 'VALUES');
-			$first_paren = stripos($query, '(', $values_pos);
-			$last_paren = $this->get_matching_paren($query, ($first_paren + 1));
-			$values = explode(',',substr($query, ($first_paren+1), ($last_paren-($first_paren+1))));
-			foreach ( $date_fields as $df ) {
-				$v = trim($values[$df['pos']]);
-				$quote = ( stripos($v, "'0000-00-00 00:00:00'") === 0 || $v === "''" ) ? "'" : '';
-				if ( stripos($v, '0000-00-00 00:00:00') === 0
-					|| stripos($v, "'0000-00-00 00:00:00'") === 0
-					|| $v === "''" ) {
-					if ( stripos($df['field'], 'gmt') > 0 ) {
-						$v = $quote.gmdate('Y-m-d H:i:s').$quote;
-					} else {
-						$v = $quote.date('Y-m-d H:i:s').$quote;
-					}
-				}
-				$values[$df['pos']] = $v;
-			}
-			$str = implode(',', $values);
-			$query = substr_replace($query, $str, ($first_paren+1), ($last_paren-($first_paren+1)));
-		}
+        if ( !$this->insert_query ) {
+            return $query;
+        }
+
+        // Lets grab the fields to be inserted into and their position
+        // based on the csv.
+        $first_paren = stripos($query, '(', 11) + 1;
+        $last_paren = $this->get_matching_paren($query, $first_paren);
+        $fields = explode(',',substr($query, $first_paren, ($last_paren - $first_paren)));
+        $date_fields = array();
+        $date_fields_map = $this->fields_map->by_type('date');
+        foreach ($fields as $key => $field ) {
+                $field = trim($field);
+
+                if ( in_array($field, $date_fields_map) ) {
+                        $date_fields[] = array('pos' => $key, 'field' => $field);
+                }
+        }
+
+        // we have date fields to check
+        if ( count($date_fields) > 0 ) {
+                // we need to get the values
+                $values_pos = stripos($query, 'VALUES');
+                $first_paren = stripos($query, '(', $values_pos);
+                $last_paren = $this->get_matching_paren($query, ($first_paren + 1));
+                $values = explode(',',substr($query, ($first_paren+1), ($last_paren-($first_paren+1))));
+                foreach ( $date_fields as $df ) {
+                        $v = trim($values[$df['pos']]);
+                        $quote = ( stripos($v, "'0000-00-00 00:00:00'") === 0 || $v === "''" ) ? "'" : '';
+                        if ( stripos($v, '0000-00-00 00:00:00') === 0
+                                || stripos($v, "'0000-00-00 00:00:00'") === 0
+                                || $v === "''" ) {
+                                if ( stripos($df['field'], 'gmt') > 0 ) {
+                                        $v = $quote.gmdate('Y-m-d H:i:s').$quote;
+                                } else {
+                                        $v = $quote.date('Y-m-d H:i:s').$quote;
+                                }
+                        }
+                        $values[$df['pos']] = $v;
+                }
+                $str = implode(',', $values);
+                $query = substr_replace($query, $str, ($first_paren+1), ($last_paren-($first_paren+1)));
+        }
  
         return $query;
     }
@@ -926,40 +936,40 @@ class SQL_Translations
      *
      * @return string Translated Query
      */
-	function translate_incompat_data_type($query)
-	{
-		if ( !$this->select_query && !$this->delete_query ) {
-			return $query;
-		}
-		
-		$operators = array(
-			'='  => 'LIKE',
-			'!=' => 'NOT LIKE',
-			'<>' => 'NOT LIKE'
-		);
-		
-		$field_types = array('ntext', 'nvarchar', 'text', 'varchar');
+    function translate_incompat_data_type($query)
+    {
+        if ( !$this->select_query && !$this->delete_query ) {
+            return $query;
+        }
+        
+        $operators = array(
+            '='  => 'LIKE',
+            '!=' => 'NOT LIKE',
+            '<>' => 'NOT LIKE'
+        );
+        
+        $field_types = array('ntext', 'nvarchar', 'text', 'varchar');
 
-		foreach($this->fields_map->read() as $table => $table_fields) {
-			if (!is_array($table_fields)) {
-				continue;
-			}
-			foreach ($table_fields as $field => $field_meta) {
-				if ( !in_array($field_meta['type'], $field_types) ) {
-					continue;
-				}
-				foreach($operators as $oper => $val) {
-					$query = preg_replace('/\s+'.$table . '.' . $field.'\s*'.$oper.'/i', ' '.$table . '.' . $field . ' ' . $val, $query);
-					$query = preg_replace('/\s+'.$field.'\s*'.$oper.'/i', ' ' . $field . ' ' . $val, $query);
-					// check for integers to cast.
-					$query = preg_replace('/\s+LIKE\s*(-?\d+)/i', " {$val} cast($1 as nvarchar(max))", $query);
-				}
-			}
-			
-		}
-		
-		return $query;
-	}
+        foreach($this->fields_map->read() as $table => $table_fields) {
+            if (!is_array($table_fields)) {
+                continue;
+            }
+            foreach ($table_fields as $field => $field_meta) {
+                if ( !in_array($field_meta['type'], $field_types) ) {
+                    continue;
+                }
+                foreach($operators as $oper => $val) {
+                    $query = preg_replace('/\s+'.$table . '.' . $field.'\s*'.$oper.'/i', ' '.$table . '.' . $field . ' ' . $val, $query);
+                    $query = preg_replace('/\s+'.$field.'\s*'.$oper.'/i', ' ' . $field . ' ' . $val, $query);
+                    // check for integers to cast.
+                    $query = preg_replace('/\s+LIKE\s*(-?\d+)/i', " {$val} cast($1 as nvarchar(max))", $query);
+                }
+            }
+            
+        }
+        
+        return $query;
+    }
 
     /**
      * General create/alter query translations
@@ -975,38 +985,38 @@ class SQL_Translations
         if ( !$this->create_query ) {
             return $query;
         }
-		
-		// fix enum as it doesn't exist in T-SQL
-		if (stripos($query, 'enum(') !== false) {
-			$enums = array_reverse($this->stripos_all($query, 'enum('));
-			foreach ($enums as $start_pos) {
-				$end = $this->get_matching_paren($query, $start_pos + 5);
-				// get values inside enum
-				$values = substr($query, $start_pos + 5, ($end - ($start_pos + 5)));
-				$values = explode(',', $values);
-				$all_int = true;
-				foreach ($values as $value) {
-					$val = trim(str_replace("'", '', $value));
-					if (!is_numeric($val) || (int) $val != $val) {
-						$all_int = false;
-					}
-				}
-				// if enum of ints create an appropriate int column otherwise create a varchar
-				if ($all_int) {
-					$query = substr_replace($query, 'smallint', $start_pos, ($end + 1) - $start_pos);
-				} else {
-					$query = substr_replace($query, 'nvarchar(255)', $start_pos, ($end + 1) - $start_pos);
-				}
-			}
-		}
-		
-		// remove IF NOT EXISTS as that doesn't exist in T-SQL
-		$query = str_ireplace(' IF NOT EXISTS', '', $query);
-	
-		// save array to file_maps
-		$this->fields_map->update_for($query);
+        
+        // fix enum as it doesn't exist in T-SQL
+        if (stripos($query, 'enum(') !== false) {
+            $enums = array_reverse($this->stripos_all($query, 'enum('));
+            foreach ($enums as $start_pos) {
+                $end = $this->get_matching_paren($query, $start_pos + 5);
+                // get values inside enum
+                $values = substr($query, $start_pos + 5, ($end - ($start_pos + 5)));
+                $values = explode(',', $values);
+                $all_int = true;
+                foreach ($values as $value) {
+                    $val = trim(str_replace("'", '', $value));
+                    if (!is_numeric($val) || (int) $val != $val) {
+                        $all_int = false;
+                    }
+                }
+                // if enum of ints create an appropriate int column otherwise create a varchar
+                if ($all_int) {
+                    $query = substr_replace($query, 'smallint', $start_pos, ($end + 1) - $start_pos);
+                } else {
+                    $query = substr_replace($query, 'nvarchar(255)', $start_pos, ($end + 1) - $start_pos);
+                }
+            }
+        }
+        
+        // remove IF NOT EXISTS as that doesn't exist in T-SQL
+        $query = str_ireplace(' IF NOT EXISTS', '', $query);
+    
+        // save array to file_maps
+        $this->fields_map->update_for($query);
 
-		// change auto increment to indentity
+        // change auto increment to indentity
         $start_positions = array_reverse($this->stripos_all($query, 'auto_increment'));
         if( stripos($query, 'auto_increment') > 0 ) {
             foreach ($start_positions as $start_pos) {
@@ -1049,57 +1059,57 @@ class SQL_Translations
         $end = $this->get_matching_paren($query, $pos + 1);
         $query = substr_replace($query, ');', $end);
 
-		$query = str_ireplace("DEFAULT CHARACTER SET utf8", '', $query);
-		$query = str_ireplace("CHARACTER SET utf8", '', $query);
-		
-		if ( ! empty($this->charset) ) {
-			$query = str_ireplace("DEFAULT CHARACTER SET {$this->charset}", '', $query);
-		}
-		if ( ! empty($this->collate) ) {
-			$query = str_ireplace("COLLATE {$this->collate}", '', $query);
-		}
-		
-		// add collation
-		$ac_types = array('tinytext', 'longtext', 'mediumtext', 'text', 'varchar');
-		foreach ($ac_types as $ac_type) {
-			$start_positions = array_reverse($this->stripos_all($query, $ac_type));
-			foreach ($start_positions as $start_pos) {
-				if ($ac_type == 'varchar') {
-					if (substr($query, $start_pos - 1, 8) == 'NVARCHAR') {
-						continue;
-					}
-					$query = substr_replace($query, 'NVARCHAR', $start_pos, strlen($ac_type));
-					$end = $this->get_matching_paren($query, $start_pos + 9);
-					$sub = substr($query, $end + 2, 7);
-					$end_pos = $end + 1;
-				} else {
-					if ($ac_type == 'text' && substr($query, $start_pos - 1, strlen($ac_type) + 1) == 'NTEXT') {
-						continue;
-					}
-					$query = substr_replace($query, 'NVARCHAR(MAX)', $start_pos, strlen($ac_type));
-					$sub = substr($query, $start_pos + 14, 7);
-					$end_pos = $start_pos + 13;
-				}
+        $query = str_ireplace("DEFAULT CHARACTER SET utf8", '', $query);
+        $query = str_ireplace("CHARACTER SET utf8", '', $query);
+        
+        if ( ! empty($this->charset) ) {
+            $query = str_ireplace("DEFAULT CHARACTER SET {$this->charset}", '', $query);
+        }
+        if ( ! empty($this->collate) ) {
+            $query = str_ireplace("COLLATE {$this->collate}", '', $query);
+        }
+        
+        // add collation
+        $ac_types = array('tinytext', 'longtext', 'mediumtext', 'text', 'varchar');
+        foreach ($ac_types as $ac_type) {
+            $start_positions = array_reverse($this->stripos_all($query, $ac_type));
+            foreach ($start_positions as $start_pos) {
+                if ($ac_type == 'varchar') {
+                    if (substr($query, $start_pos - 1, 8) == 'NVARCHAR') {
+                        continue;
+                    }
+                    $query = substr_replace($query, 'NVARCHAR', $start_pos, strlen($ac_type));
+                    $end = $this->get_matching_paren($query, $start_pos + 9);
+                    $sub = substr($query, $end + 2, 7);
+                    $end_pos = $end + 1;
+                } else {
+                    if ($ac_type == 'text' && substr($query, $start_pos - 1, strlen($ac_type) + 1) == 'NTEXT') {
+                        continue;
+                    }
+                    $query = substr_replace($query, 'NVARCHAR(MAX)', $start_pos, strlen($ac_type));
+                    $sub = substr($query, $start_pos + 14, 7);
+                    $end_pos = $start_pos + 13;
+                }
 
-				if ($sub !== 'COLLATE') {
-					$query = $this->add_collation($query, $end_pos);
-				}
-			}
-		}
+                if ($sub !== 'COLLATE') {
+                    $query = $this->add_collation($query, $end_pos);
+                }
+            }
+        }
 
         $keys = array();
         $table_pos = stripos($query, ' TABLE ') + 6;
         $table = substr($query, $table_pos, stripos($query, '(', $table_pos) - $table_pos);
         $table = trim($table);
-		
-		$reserved_words = array('public');
-		// get column names to check for reserved words to encapsulate with [ ]
-		foreach($this->fields_map->read() as $table_name => $table_fields) {
+        
+        $reserved_words = array('public');
+        // get column names to check for reserved words to encapsulate with [ ]
+        foreach($this->fields_map->read() as $table_name => $table_fields) {
             if ($table_name == $table && is_array($table_fields)) {
                 foreach ($table_fields as $field => $field_meta) {
                     if (in_array($field, $reserved_words)) {
-						$query = str_ireplace($field, "[{$field}]", $query);
-					}
+                        $query = str_ireplace($field, "[{$field}]", $query);
+                    }
                 }
             }
         }
@@ -1111,11 +1121,11 @@ class SQL_Translations
                 $start = stripos($query, '(', $start_pos);
                 $end_paren = $this->get_matching_paren($query, $start + 1);
                 $field = explode(',', substr($query, $start + 1, $end_paren - ($start + 1)));
-				foreach ($field as $k => $v) {
-					if (stripos($v, '(') !== false) {
-						$field[$k] = preg_replace('/\(.*\)/', '', $v);
-					}
-				}
+                foreach ($field as $k => $v) {
+                    if (stripos($v, '(') !== false) {
+                        $field[$k] = preg_replace('/\(.*\)/', '', $v);
+                    }
+                }
                 $keys[] = array('type' => 'PRIMARY KEY', 'pos' => $start_pos, 'field' => $field);
             }
         }
@@ -1126,11 +1136,11 @@ class SQL_Translations
                 $start = stripos($query, '(', $start_pos);
                 $end_paren = $this->get_matching_paren($query, $start + 1);
                 $field = explode(',', substr($query, $start + 1, $end_paren - ($start + 1)));
-				foreach ($field as $k => $v) {
-					if (stripos($v, '(') !== false) {
-						$field[$k] = preg_replace('/\(.*\)/', '', $v);
-					}
-				}
+                foreach ($field as $k => $v) {
+                    if (stripos($v, '(') !== false) {
+                        $field[$k] = preg_replace('/\(.*\)/', '', $v);
+                    }
+                }
                 $keys[] = array('type' => 'UNIQUE KEY', 'pos' => $start_pos, 'field' => $field);
             }
         }
@@ -1144,11 +1154,11 @@ class SQL_Translations
                     $start = stripos($query, '(', $start_pos);
                     $end_paren = $this->get_matching_paren($query, $start + 1);
                     $field = explode(',', substr($query, $start + 1, $end_paren - ($start + 1)));
-					foreach ($field as $k => $v) {
-						if (stripos($v, '(') !== false) {
-							$field[$k] = preg_replace('/\(.*\)/', '', $v);
-						}
-					}
+                    foreach ($field as $k => $v) {
+                        if (stripos($v, '(') !== false) {
+                            $field[$k] = preg_replace('/\(.*\)/', '', $v);
+                        }
+                    }
                     $keys[] = array('type' => 'KEY', 'pos' => $start_pos, 'field' => $field);
                 }
             }
@@ -1189,10 +1199,10 @@ class SQL_Translations
             }
             switch ($keys[$i]['type']) {
                 case 'PRIMARY KEY':
-					$str = "CONSTRAINT [" . $table . "_" . implode('_', $keys[$i]['field']) . "] PRIMARY KEY CLUSTERED (" . implode(',', $keys[$i]['field']) . ") WITH (IGNORE_DUP_KEY = OFF)";
-					if (!$this->azure ) {
-						$str .= " ON [PRIMARY]";
-					}
+                    $str = "CONSTRAINT [" . $table . "_" . implode('_', $keys[$i]['field']) . "] PRIMARY KEY CLUSTERED (" . implode(',', $keys[$i]['field']) . ") WITH (IGNORE_DUP_KEY = OFF)";
+                    if (!$this->azure ) {
+                        $str .= " ON [PRIMARY]";
+                    }
                 break;
                 case 'UNIQUE KEY':
                     $check = true;
@@ -1202,41 +1212,41 @@ class SQL_Translations
                         }
                     }
                     if ($check) {
-						if ($this->azure) {
-							$str = 'CONSTRAINT [' . $table . '_' . implode('_', $keys[$i]['field']) . '] UNIQUE NONCLUSTERED (' . implode(',', $keys[$i]['field']) . ')';
-						} else {
-							$str = 'CONSTRAINT [' . $table . '_' . implode('_', $keys[$i]['field']) . '] UNIQUE NONCLUSTERED (' . implode(',', $keys[$i]['field']) . ')';
-						}
-					} else {
+                        if ($this->azure) {
+                            $str = 'CONSTRAINT [' . $table . '_' . implode('_', $keys[$i]['field']) . '] UNIQUE NONCLUSTERED (' . implode(',', $keys[$i]['field']) . ')';
+                        } else {
+                            $str = 'CONSTRAINT [' . $table . '_' . implode('_', $keys[$i]['field']) . '] UNIQUE NONCLUSTERED (' . implode(',', $keys[$i]['field']) . ')';
+                        }
+                    } else {
                         $str = '';
                     }
                 break;
-				case 'KEY':
-					// CREATE NONCLUSTERED INDEX index_name ON table(col1,col2)
-					$check = true;
-					$str = '';
+                case 'KEY':
+                    // CREATE NONCLUSTERED INDEX index_name ON table(col1,col2)
+                    $check = true;
+                    $str = '';
                     foreach ($keys[$i]['field'] as $field) {
                         if (in_array($field, $unwanted)) {
                             $check = false;
                         }
                     }
                     if ($check) {
-						if (!is_array($this->following_query) && $this->following_query === false) {
-							$this->following_query = array();
-						} elseif (!is_array($this->following_query)) {
-							$this->following_query = array($this->following_query);
-						}
-						if ($this->azure) {
-							$this->following_query[] = 'CREATE CLUSTERED INDEX ' . 
-							$table . '_' . implode('_', $keys[$i]['field']) . 
-							' ON '.$table.'('.implode(',', $keys[$i]['field']).')';
-						} else {
-							$this->following_query[] = 'CREATE NONCLUSTERED INDEX ' . 
-							$table . '_' . implode('_', $keys[$i]['field']) . 
-							' ON '.$table.'('.implode(',', $keys[$i]['field']).')';
-						}
+                        if (!is_array($this->following_query) && $this->following_query === false) {
+                            $this->following_query = array();
+                        } elseif (!is_array($this->following_query)) {
+                            $this->following_query = array($this->following_query);
+                        }
+                        if ($this->azure) {
+                            $this->following_query[] = 'CREATE CLUSTERED INDEX ' . 
+                            $table . '_' . implode('_', $keys[$i]['field']) . 
+                            ' ON '.$table.'('.implode(',', $keys[$i]['field']).')';
+                        } else {
+                            $this->following_query[] = 'CREATE NONCLUSTERED INDEX ' . 
+                            $table . '_' . implode('_', $keys[$i]['field']) . 
+                            ' ON '.$table.'('.implode(',', $keys[$i]['field']).')';
+                        }
                     }
-				break;
+                break;
             }
             if ($i !== $count - 1 && $str !== '') {
                 $str .= ',';
@@ -1333,9 +1343,9 @@ class SQL_Translations
                     // date_format is a PHP5 function. sqlsrv is only PHP5 compat
                     // the result set for datetime columns is a PHP DateTime object, to extract
                     // the string we need to use date_format().
-					if (is_object($result->$date_field)) {
-						$result_set[$key]->$date_field = date_format($result->$date_field, 'Y-m-d H:i:s');
-					}
+                    if (is_object($result->$date_field)) {
+                        $result_set[$key]->$date_field = date_format($result->$date_field, 'Y-m-d H:i:s');
+                    }
                 }
             }
             // Check for null values being returned as space and change integers to strings (to mimic mysql results)
@@ -1351,46 +1361,46 @@ class SQL_Translations
                 }
             }
         }
-		
-		$map_fields = $this->fields_map->by_type('ntext');
-		foreach ( $result_set as $key => $result ) {
-			foreach ( $map_fields as $text_field ) {
-				if ( isset($result->$text_field) ) {
-					$result_set[$key]->$text_field = str_replace("''", "'", $result->$text_field);
-				}
-			}
-		}
+        
+        $map_fields = $this->fields_map->by_type('ntext');
+        foreach ( $result_set as $key => $result ) {
+            foreach ( $map_fields as $text_field ) {
+                if ( isset($result->$text_field) ) {
+                    $result_set[$key]->$text_field = str_replace("''", "'", $result->$text_field);
+                }
+            }
+        }
         return $result_set;
     }
-	
-	/**
-	 * Check to see if INSERT has an ON DUPLICATE KEY statement
-	 * This is MySQL specific and will be removed and put into 
-	 * a following_query UPDATE STATEMENT
-	 *
-	 * @param string $query Query coming in
-	 * @return string query without ON DUPLICATE KEY statement
-	 */
-	 function on_duplicate_key($query)
-	 {
-		if ( stripos($query, 'ON DUPLICATE KEY UPDATE') > 0 ) {
-			$table = substr($query, 12, (strpos($query, ' ', 12) - 12));
-			// currently just deal with wp_options table
-			if (stristr($table, 'options') !== FALSE) {
-				$start_pos = stripos($query, 'ON DUPLICATE KEY UPDATE');
-				$query = substr_replace($query, '', $start_pos);
-				$values_pos = stripos($query, 'VALUES');
-				$first_paren = stripos($query, '(', $values_pos);
-				$last_paren = $this->get_matching_paren($query, $first_paren + 1);
-				$values = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
-				// change this to use mapped fields
-				$update = 'UPDATE ' . $table . ' SET option_value = ' . $values[1] . ', autoload = ' . $values[2] . 
-					' WHERE option_name = ' . $values[0];
-				$this->following_query = $update;
-			}
+    
+    /**
+     * Check to see if INSERT has an ON DUPLICATE KEY statement
+     * This is MySQL specific and will be removed and put into 
+     * a following_query UPDATE STATEMENT
+     *
+     * @param string $query Query coming in
+     * @return string query without ON DUPLICATE KEY statement
+     */
+     function on_duplicate_key($query)
+     {
+        if ( stripos($query, 'ON DUPLICATE KEY UPDATE') > 0 ) {
+            $table = substr($query, 12, (strpos($query, ' ', 12) - 12));
+            // currently just deal with wp_options table
+            if (stristr($table, 'options') !== FALSE) {
+                $start_pos = stripos($query, 'ON DUPLICATE KEY UPDATE');
+                $query = substr_replace($query, '', $start_pos);
+                $values_pos = stripos($query, 'VALUES');
+                $first_paren = stripos($query, '(', $values_pos);
+                $last_paren = $this->get_matching_paren($query, $first_paren + 1);
+                $values = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
+                // change this to use mapped fields
+                $update = 'UPDATE ' . $table . ' SET option_value = ' . $values[1] . ', autoload = ' . $values[2] . 
+                    ' WHERE option_name = ' . $values[0];
+                $this->following_query = $update;
+            }
         }
-		return $query;
-	 }
+        return $query;
+     }
 
     /**
      * Check to see if an INSERT query has multiple VALUES blocks. If so we need create
@@ -1409,14 +1419,14 @@ class SQL_Translations
             $values = substr($query, (stripos($query, 'VALUES') + 7));
             $arr = preg_split('/\),\s+\(/', $values);
             foreach ($arr as $k => $v) {
-				if (substr($v, -1) !== ')') {
-					$v = $v . ')';
-				}
-				
-				if (substr($v, 0, 1) !== '(') {
-					$v = '(' . $v;
-				}
-				
+                if (substr($v, -1) !== ')') {
+                    $v = $v . ')';
+                }
+                
+                if (substr($v, 0, 1) !== '(') {
+                    $v = '(' . $v;
+                }
+                
                 $arr[$k] = $first . $v;
             }
         }
@@ -1441,52 +1451,52 @@ class SQL_Translations
      */
     function verify_insert($query)
     {
-		$map_fields = $this->fields_map->by_type('ntext') + $this->fields_map->by_type('nvarchar');
+        $map_fields = $this->fields_map->by_type('ntext') + $this->fields_map->by_type('nvarchar');
 
-		$first_paren = stripos($query, '(', 0);
+        $first_paren = stripos($query, '(', 0);
         $last_paren = $this->get_matching_paren($query, $first_paren + 1);
-		$cols = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
+        $cols = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
         $values_pos = stripos($query, 'VALUES');
         $first_paren = stripos($query, '(', $values_pos);
         $last_paren = $this->get_matching_paren($query, $first_paren + 1);
         $values = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
 
-		$arr = array();
-		foreach ( $values as $k => $value ) {
-			if (isset($cols[$k])) {
-				foreach ($map_fields as $text_field) {
-					if (trim($cols[$k]) == $text_field) {
-						$arr[] = $k;
-					}
-				}
-			}
-		}
-		$str = '';
-		foreach ($values as $k => $value) {
-			$val = trim($value);
-			$end = strlen($val) - 1;
-			if (in_array($k, $arr) && $val[0] == "'" && $val[$end] == "'") {
-				$str .= 'N' . trim($value) . ',';
-			} else {
-				$str .= $value . ',';
-			}
-		}
-		$str = rtrim($str, ',');
-		$query = substr_replace($query, $str, ($first_paren + 1), ($last_paren - ($first_paren + 1)));
+        $arr = array();
+        foreach ( $values as $k => $value ) {
+            if (isset($cols[$k])) {
+                foreach ($map_fields as $text_field) {
+                    if (trim($cols[$k]) == $text_field) {
+                        $arr[] = $k;
+                    }
+                }
+            }
+        }
+        $str = '';
+        foreach ($values as $k => $value) {
+            $val = trim($value);
+            $end = strlen($val) - 1;
+            if (in_array($k, $arr) && $val[0] == "'" && $val[$end] == "'") {
+                $str .= 'N' . trim($value) . ',';
+            } else {
+                $str .= $value . ',';
+            }
+        }
+        $str = rtrim($str, ',');
+        $query = substr_replace($query, $str, ($first_paren + 1), ($last_paren - ($first_paren + 1)));
 
         if ( count($this->prepare_args) !== count($values) ) {
             return $query;
         }
         $i = 0;
         foreach ( $values as $k => $value ) {
-			$N = '';
-			if (isset($cols[$k])) {
-			    foreach ($map_fields as $text_field) {
-					if (trim($cols[$k]) == $text_field) {
-						$N = 'N';
-					}
-				}
-			}
+            $N = '';
+            if (isset($cols[$k])) {
+                foreach ($map_fields as $text_field) {
+                    if (trim($cols[$k]) == $text_field) {
+                        $N = 'N';
+                    }
+                }
+            }
             $value = trim($value);
             foreach ($this->prepare_args as $r => $arg) {
                 if ( $k == $i && $arg !== $value ) {
@@ -1498,9 +1508,9 @@ class SQL_Translations
             }
         }
         $str = implode(',', $values);
-		$first_paren = stripos($query, '(', 0);
+        $first_paren = stripos($query, '(', 0);
         $last_paren = $this->get_matching_paren($query, $first_paren + 1);
-		$cols = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
+        $cols = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
         $values_pos = stripos($query, 'VALUES');
         $first_paren = stripos($query, '(', $values_pos);
         $last_paren = $this->get_matching_paren($query, $first_paren + 1);
@@ -1524,8 +1534,8 @@ class SQL_Translations
     function verify_update($query)
     {
         $values = array();
-		$keys = array();
-		$map_fields = $this->fields_map->by_type('ntext') + $this->fields_map->by_type('nvarchar');
+        $keys = array();
+        $map_fields = $this->fields_map->by_type('ntext') + $this->fields_map->by_type('nvarchar');
         $start = stripos($query, 'SET') + 3;
         $end = strripos($query, 'WHERE');
         $sub = substr($query, $start, $end - $start);
@@ -1535,22 +1545,22 @@ class SQL_Translations
             $st = stripos($v, ' =');
             $sv = substr($v, 0, $st);
             $sp = substr($v, $st + 4, -1);
-			$keys[] = $sv;
+            $keys[] = $sv;
             $values[] = str_replace("'", "''", $sp);
         }
-		
-		foreach ( $values as $y => $vt ) {
-			$n = '';
-			foreach ($map_fields as $text_field) {
-				if (trim($keys[$y]) == $text_field) {
-					$n = 'N';
-				}
-			}
-			$values[$y] = $keys[$y] . " = $n'" . $vt . "'";
-		}
+        
+        foreach ( $values as $y => $vt ) {
+            $n = '';
+            foreach ($map_fields as $text_field) {
+                if (trim($keys[$y]) == $text_field) {
+                    $n = 'N';
+                }
+            }
+            $values[$y] = $keys[$y] . " = $n'" . $vt . "'";
+        }
 
-		$str = implode(', ', $values) . ' ';
-		$query = substr_replace($query, $str, ($start+1), ($end-($start+1)));
+        $str = implode(', ', $values) . ' ';
+        $query = substr_replace($query, $str, ($start+1), ($end-($start+1)));
 
         return $query;
     }
@@ -1565,19 +1575,19 @@ class SQL_Translations
      */
     function add_collation($query, $pos)
     {
-		switch (WPLANG) {
-			case 'ru_RU':
-				$collation = 'Cyrillic_General_BIN';
-			break;
-			case 'en_US':
-			default:
-				$collation = 'Latin1_General_BIN';
-			break;
-		}
+        switch (WPLANG) {
+            case 'ru_RU':
+                $collation = 'Cyrillic_General_BIN';
+            break;
+            case 'en_US':
+            default:
+                $collation = 'Latin1_General_BIN';
+            break;
+        }
         $query = substr_replace($query, " COLLATE $collation", $pos, 0);
         return $query;
     }
-	
+    
     /**
      * Describe wrapper
      *
@@ -1586,63 +1596,63 @@ class SQL_Translations
      *
      * @return string
      */
-	function describe($table)
-	{
-		$sql = "SELECT
-			c.name AS Field
-			,t.name + t.length_string AS Type
-			,CASE c.is_nullable WHEN 1 THEN 'YES' ELSE 'NO' END AS [Null]
-			,CASE
-				WHEN EXISTS (SELECT * FROM sys.key_constraints AS kc
-							   INNER JOIN sys.index_columns AS ic ON kc.unique_index_id = ic.index_id AND kc.parent_object_id = ic.object_id
-							   WHERE kc.type = 'PK' AND ic.column_id = c.column_id AND c.object_id = ic.object_id)
-							   THEN 'PRI'
-				WHEN EXISTS (SELECT * FROM sys.key_constraints AS kc
-							   INNER JOIN sys.index_columns AS ic ON kc.unique_index_id = ic.index_id AND kc.parent_object_id = ic.object_id
-							   WHERE kc.type <> 'PK' AND ic.column_id = c.column_id AND c.object_id = ic.object_id)
-							   THEN 'UNI'
-				ELSE ''
-			END AS [Key]
-			,ISNULL((
-				SELECT TOP(1)
-					dc.definition
-				FROM sys.default_constraints AS dc
-				WHERE dc.parent_column_id = c.column_id AND c.object_id = dc.parent_object_id)
-			,'') AS [Default]
-			,CASE
-				WHEN EXISTS (
-					SELECT
-						*
-					FROM sys.identity_columns AS ic
-					WHERE ic.column_id = c.column_id AND c.object_id = ic.object_id)
-						THEN 'auto_increment'
-				ELSE ''
-			END AS Extra
-		FROM sys.columns AS c
-		CROSS APPLY (
-			SELECT
-				t.name AS n1
-				,CASE
-					-- Types with length
-					WHEN c.max_length > 0 AND t.name IN ('varchar', 'char', 'varbinary', 'binary') THEN '(' + CAST(c.max_length AS VARCHAR) + ')'
-					WHEN c.max_length > 0 AND t.name IN ('nvarchar', 'nchar') THEN '(' + CAST(c.max_length/2 AS VARCHAR) + ')'
-					WHEN c.max_length < 0 AND t.name IN ('nvarchar', 'varchar', 'varbinary') THEN '(max)'
-					-- Types with precision & scale
-					WHEN t.name IN ('decimal', 'numeric') THEN '(' + CAST(c.precision AS VARCHAR) + ',' + CAST(c.scale AS VARCHAR) + ')'
-					-- Types with only precision
-					WHEN t.name IN ('float') THEN '(' + CAST(c.precision AS VARCHAR) + ')'
-					-- Types with only scale
-					WHEN t.name IN ('datetime2', 'time', 'datetimeoffset') THEN '(' + CAST(c.scale AS VARCHAR) + ')'
-					-- The rest take no arguments
-					ELSE ''
-				END AS length_string
-				,*
-			FROM sys.types AS t
-			WHERE t.system_type_id = c.system_type_id AND t.system_type_id = t.user_type_id
-		) AS t
-		WHERE object_id = OBJECT_ID('{$table}');";
-		return $sql;
-	}
+    function describe($table)
+    {
+        $sql = "SELECT
+            c.name AS Field
+            ,t.name + t.length_string AS Type
+            ,CASE c.is_nullable WHEN 1 THEN 'YES' ELSE 'NO' END AS [Null]
+            ,CASE
+                WHEN EXISTS (SELECT * FROM sys.key_constraints AS kc
+                               INNER JOIN sys.index_columns AS ic ON kc.unique_index_id = ic.index_id AND kc.parent_object_id = ic.object_id
+                               WHERE kc.type = 'PK' AND ic.column_id = c.column_id AND c.object_id = ic.object_id)
+                               THEN 'PRI'
+                WHEN EXISTS (SELECT * FROM sys.key_constraints AS kc
+                               INNER JOIN sys.index_columns AS ic ON kc.unique_index_id = ic.index_id AND kc.parent_object_id = ic.object_id
+                               WHERE kc.type <> 'PK' AND ic.column_id = c.column_id AND c.object_id = ic.object_id)
+                               THEN 'UNI'
+                ELSE ''
+            END AS [Key]
+            ,ISNULL((
+                SELECT TOP(1)
+                    dc.definition
+                FROM sys.default_constraints AS dc
+                WHERE dc.parent_column_id = c.column_id AND c.object_id = dc.parent_object_id)
+            ,'') AS [Default]
+            ,CASE
+                WHEN EXISTS (
+                    SELECT
+                        *
+                    FROM sys.identity_columns AS ic
+                    WHERE ic.column_id = c.column_id AND c.object_id = ic.object_id)
+                        THEN 'auto_increment'
+                ELSE ''
+            END AS Extra
+        FROM sys.columns AS c
+        CROSS APPLY (
+            SELECT
+                t.name AS n1
+                ,CASE
+                    -- Types with length
+                    WHEN c.max_length > 0 AND t.name IN ('varchar', 'char', 'varbinary', 'binary') THEN '(' + CAST(c.max_length AS VARCHAR) + ')'
+                    WHEN c.max_length > 0 AND t.name IN ('nvarchar', 'nchar') THEN '(' + CAST(c.max_length/2 AS VARCHAR) + ')'
+                    WHEN c.max_length < 0 AND t.name IN ('nvarchar', 'varchar', 'varbinary') THEN '(max)'
+                    -- Types with precision & scale
+                    WHEN t.name IN ('decimal', 'numeric') THEN '(' + CAST(c.precision AS VARCHAR) + ',' + CAST(c.scale AS VARCHAR) + ')'
+                    -- Types with only precision
+                    WHEN t.name IN ('float') THEN '(' + CAST(c.precision AS VARCHAR) + ')'
+                    -- Types with only scale
+                    WHEN t.name IN ('datetime2', 'time', 'datetimeoffset') THEN '(' + CAST(c.scale AS VARCHAR) + ')'
+                    -- The rest take no arguments
+                    ELSE ''
+                END AS length_string
+                ,*
+            FROM sys.types AS t
+            WHERE t.system_type_id = c.system_type_id AND t.system_type_id = t.user_type_id
+        ) AS t
+        WHERE object_id = OBJECT_ID('{$table}');";
+        return $sql;
+    }
 
     /**
      * Get all occurrences(positions) of a string within a string
@@ -1654,15 +1664,15 @@ class SQL_Translations
      */
     function stripos_all($haystack, $needle, $offset = 0)
     {
-		$arr = array();
-		while ($offset !== false) {
-			$pos = stripos($haystack, $needle, $offset);
-			if ($pos !== false) {
-				$arr[] = $pos;
-				$pos = $pos + strlen($needle);
-			}
-			$offset = $pos;
-		}
+        $arr = array();
+        while ($offset !== false) {
+            $pos = stripos($haystack, $needle, $offset);
+            if ($pos !== false) {
+                $arr[] = $pos;
+                $pos = $pos + strlen($needle);
+            }
+            $offset = $pos;
+        }
         return $arr;
     }
 }

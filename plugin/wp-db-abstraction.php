@@ -7,7 +7,7 @@ Description: Data-Access abstraction and SQL abstraction support for Wordpress.
              database connectivity.  Currently supports PDO, sqlsrv, mssql
              and mysql database extensions and sql abstraction for SQL Server.
              Can be easily extended for other database extensions and sql dialects.
-Version: 1.0.0
+Version: 1.0.1
 Author: Anthony Gentile and Elizabeth M Smith
 Author URI:  http://wordpress.visitmix.com/
 License: GPLv2
@@ -34,76 +34,76 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * upgrades until they're tested
  */
 function wp_db_abstraction_check_core_upgrade() {
-	global $wp_version, $wpdb, $wp_local_package;
-	$php_version = phpversion();
+    global $wp_version, $wpdb, $wp_local_package;
+    $php_version = phpversion();
 
-	$locale = apply_filters( 'core_version_check_locale', get_locale() );
+    $locale = apply_filters( 'core_version_check_locale', get_locale() );
 
-	if ( method_exists( $wpdb, 'db_version' ) )
-		$mysql_version = preg_replace('/[^0-9.].*/', '', $wpdb->db_version());
-	else
-		$mysql_version = 'N/A';
+    if ( method_exists( $wpdb, 'db_version' ) )
+        $mysql_version = preg_replace('/[^0-9.].*/', '', $wpdb->db_version());
+    else
+        $mysql_version = 'N/A';
 
-	if ( is_multisite( ) ) {
-		$user_count = get_user_count( );
-		$num_blogs = get_blog_count( );
-		$wp_install = network_site_url( );
-		$multisite_enabled = 1;
-	} else {
-		$user_count = count_users( );
-		$multisite_enabled = 0;
-		$num_blogs = 1;
-		$wp_install = home_url( '/' );
-	}
+    if ( is_multisite( ) ) {
+        $user_count = get_user_count( );
+        $num_blogs = get_blog_count( );
+        $wp_install = network_site_url( );
+        $multisite_enabled = 1;
+    } else {
+        $user_count = count_users( );
+        $multisite_enabled = 0;
+        $num_blogs = 1;
+        $wp_install = home_url( '/' );
+    }
 
-	$local_package = isset( $wp_local_package )? $wp_local_package : '';
-	$url = "http://wordpress.visitmix.com/api/wp/?version=$wp_version&php=$php_version&locale=$locale&mysql=$mysql_version&local_package=$local_package&blogs=$num_blogs&users={$user_count['total_users']}&multisite_enabled=$multisite_enabled";
+    $local_package = isset( $wp_local_package )? $wp_local_package : '';
+    $url = "http://wordpress.visitmix.com/api/wp/?version=$wp_version&php=$php_version&locale=$locale&mysql=$mysql_version&local_package=$local_package&blogs=$num_blogs&users={$user_count['total_users']}&multisite_enabled=$multisite_enabled";
 
-	$options = array(
-		'timeout' => ( ( defined('DOING_CRON') && DOING_CRON ) ? 30 : 3 ),
-		'user-agent' => 'WordPress/' . $wp_version . '; ' . home_url( '/' ),
-		'headers' => array(
-			'wp_install' => $wp_install,
-			'wp_blog' => home_url( '/' )
-		)
-	);
+    $options = array(
+        'timeout' => ( ( defined('DOING_CRON') && DOING_CRON ) ? 30 : 3 ),
+        'user-agent' => 'WordPress/' . $wp_version . '; ' . home_url( '/' ),
+        'headers' => array(
+            'wp_install' => $wp_install,
+            'wp_blog' => home_url( '/' )
+        )
+    );
 
-	$response = wp_remote_get($url, $options);
+    $response = wp_remote_get($url, $options);
 
-	if ( is_wp_error( $response ) )
-		return false;
+    if ( is_wp_error( $response ) )
+        return false;
 
-	if ( 200 != $response['response']['code'] )
-		return false;
+    if ( 200 != $response['response']['code'] )
+        return false;
 
-	$body = trim( $response['body'] );
-	$body = str_replace(array("\r\n", "\r"), "\n", $body);
-	$new_options = array();
-	foreach ( explode( "\n\n", $body ) as $entry ) {
-		$returns = explode("\n", $entry);
-		$new_option = new stdClass();
-		$new_option->response = esc_attr( $returns[0] );
-		if ( isset( $returns[1] ) )
-			$new_option->url = esc_url( $returns[1] );
-		if ( isset( $returns[2] ) )
-			$new_option->package = esc_url( $returns[2] );
-		if ( isset( $returns[3] ) )
-			$new_option->current = esc_attr( $returns[3] );
-		if ( isset( $returns[4] ) )
-			$new_option->locale = esc_attr( $returns[4] );
-		if ( isset( $returns[5] ) )
-			$new_option->php_version = esc_attr( $returns[5] );
-		if ( isset( $returns[6] ) )
-			$new_option->mysql_version = esc_attr( $returns[6] );
-		$new_options[] = $new_option;
-	}
+    $body = trim( $response['body'] );
+    $body = str_replace(array("\r\n", "\r"), "\n", $body);
+    $new_options = array();
+    foreach ( explode( "\n\n", $body ) as $entry ) {
+        $returns = explode("\n", $entry);
+        $new_option = new stdClass();
+        $new_option->response = esc_attr( $returns[0] );
+        if ( isset( $returns[1] ) )
+            $new_option->url = esc_url( $returns[1] );
+        if ( isset( $returns[2] ) )
+            $new_option->package = esc_url( $returns[2] );
+        if ( isset( $returns[3] ) )
+            $new_option->current = esc_attr( $returns[3] );
+        if ( isset( $returns[4] ) )
+            $new_option->locale = esc_attr( $returns[4] );
+        if ( isset( $returns[5] ) )
+            $new_option->php_version = esc_attr( $returns[5] );
+        if ( isset( $returns[6] ) )
+            $new_option->mysql_version = esc_attr( $returns[6] );
+        $new_options[] = $new_option;
+    }
 
-	$updates = new stdClass();
-	$updates->updates = $new_options;
-	$updates->last_checked = time();
-	$updates->version_checked = $wp_version;
+    $updates = new stdClass();
+    $updates->updates = $new_options;
+    $updates->last_checked = time();
+    $updates->version_checked = $wp_version;
 
-	return $updates;
+    return $updates;
 }
 
 /**

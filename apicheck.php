@@ -31,6 +31,6 @@ if ($current_version == $version) {
 header('Content-type: text/plain');
 echo $status . "\r\n";
 echo 'http://wordpress.visitmix.com/download/' . "\r\n";
-echo 'http://downloads.sourceforge.net/project/wp-sqlsrv/distribution/wp-db-abstraction-1.0.0.zip?use_mirror=iweb' . "\r\n";
+echo 'http://downloads.sourceforge.net/project/wp-sqlsrv/distribution/wp-db-abstraction-1.0.1.zip?use_mirror=iweb' . "\r\n";
 echo $current_version. "\r\n";
 echo $current_locale;

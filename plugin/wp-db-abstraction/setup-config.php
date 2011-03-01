@@ -140,7 +140,7 @@ switch($step) {
 </ol>
 <p><strong>If for any reason this automatic file creation doesn't work, don't worry. All this does is fill in the database information to a configuration file. You may also simply open <code>wp-config-sample.php</code> in a text editor, fill in your information, and save it as <code>wp-config.php</code>. </strong></p>
 <p>In all likelihood, these items were supplied to you by your Web Host. If you do not have this information, then you will need to contact them before you can continue. If you&#8217;re all ready&hellip;</p>
-
+<p>WARNING: If you are on a windows system you cannot use the mssql extension with ntwdblib since the extension has no unicode support when not used with freetds.  It is recommended you install a different extension.</p>
 <p class="step"><a href="?step=1<?php if ( isset( $_GET['noapi'] ) ) echo '&amp;noapi'; ?>" class="button">Let&#8217;s go!</a></p>
 <?php
 	break;
