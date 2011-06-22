@@ -80,40 +80,39 @@ EOD;
 }
 
 /**
- * Function to "namespace" our database object creator
- * to avoid polluting global namespace
- *
- * Notice when we call this the value becomes the global $wpdb variable
+ * Function to create a new database connection using our abstraction layer
+ * The default for calling this occurs with the DB_* constants and
+ * the value becomes the global $wpdb variable, but you can call this
+ * again with your own values to get an additional db instance
  *
  * @returns Database class instance
  */
-function wp_db_abstraction_create_wpdb () {
+function wp_db_abstraction_create_wpdb ($type, $user, $password, $name, $host) {
 
-    // BC for old config.php files
-    if ( !defined('DB_TYPE') ) {
-            define('DB_TYPE', 'mysql');
-    }
-
-    $db_type = DB_TYPE;
-
-    if (stristr(DB_TYPE, 'pdo_') !== FALSE) {
-            $db_type = 'pdo';
+    if (stristr($type, 'pdo_') !== FALSE) {
+            $type = 'pdo';
     }
 
     require_once(dirname(__FILE__) . 
             DIRECTORY_SEPARATOR . 'mu-plugins' .
             DIRECTORY_SEPARATOR . 'wp-db-abstraction' .
             DIRECTORY_SEPARATOR . 'drivers' . 
-            DIRECTORY_SEPARATOR . $db_type . '.php');
+            DIRECTORY_SEPARATOR . $type . '.php');
 
-    $class = $db_type . '_wpdb';
+    $class = $type . '_wpdb';
 
-    return new $class(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+    return new $class($user, $password, $name, $host);
 }
 
 /* Actually check our install location and create our global database object */
 wp_db_abstraction_check_db_install();
-$wpdb = wp_db_abstraction_create_wpdb();
+
+// BC for old config.php files
+if ( !defined('DB_TYPE') ) {
+    define('DB_TYPE', 'mysql');
+}
+// create our global wpdb with config settings
+$wpdb = wp_db_abstraction_create_wpdb(DB_TYPE, DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
 
 /*  ADD ANY ADDITIONAL INCLUDES HERE */
 // include 'db-plugin.php';
