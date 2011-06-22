@@ -520,12 +520,17 @@ class sqlsrv_wpdb extends SQL_Translations {
         
         /* Specify the server and connection string attributes. */
         $connection_info = array(
-            'UID' => $dbuser,
-            'PWD' => $dbpassword,
             'Database' => $dbname,
             'CharacterSet' => 'UTF-8',
+            'ReturnDatesAsStrings' => true
         );
-        
+
+        // Add username and password if set, not setting them uses windows authentication
+        if(!empty($dbuser) && !empty($dbpassword)) {
+            $connection_info['UID'] = $dbuser;
+            $connection_info['PWD'] = $dbpassword;
+        }
+
         // Is this SQL Azure?
         if (stristr($dbhost, 'database.windows.net') !== false) {
             // Need to turn off MultipleActiveResultSets, this requires
