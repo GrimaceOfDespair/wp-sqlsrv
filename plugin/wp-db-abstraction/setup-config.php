@@ -69,7 +69,7 @@ if ( version_compare( $required_php_version, phpversion(), '>' ) )
 if (!is_dir(ABSPATH . 'wp-content/mu-plugins/wp-db-abstraction/drivers/')) {
 	wp_die('Your wordpress install is missing the WP Db Abstraction plugin in the mu-plugins directory needed to access the database');
 }
-$drivers = array('mysql', 'mssql', 'sqlsrv', 'pdo');
+$drivers = array('mysql', 'mysqli', 'mssql', 'sqlsrv', 'pdo');
 $pdo_drivers = array('sqlsrv', 'mysql');
 $valid_drivers = array();
 
@@ -179,6 +179,8 @@ switch($step) {
 				foreach($valid_drivers as $option) {
 					if ($option == 'mysql') {
 						echo "<option value=\"$option\">MySQL</option>\n";
+					if ($option == 'mysqli') {
+						echo "<option value=\"$option\">MySQLi</option>\n";
 					} elseif ($option == 'sqlsrv') {
 						echo "<option value=\"$option\">SQL Server using MS PHP driver</option>\n";
 					} elseif ($option == 'mssql') {
