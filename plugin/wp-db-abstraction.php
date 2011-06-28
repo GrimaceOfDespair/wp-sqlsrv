@@ -35,6 +35,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 function wp_db_abstraction_check_core_upgrade() {
     global $wp_version, $wpdb, $wp_local_package;
+
+    // cache our check
+    $current = get_site_transient( 'wpdbab_update_core' );
+    // we've checked within the last 24 hours, done!
+    if (is_object($current) && isset($current->last_checked) &&
+        $current->last_checked < time() - 86400) {
+        return $current;
+    }
+
+    // otherwise do the check
+    if ( ! is_object($current) ) {
+        $current = new stdClass;
+        $current->updates = array();
+        $current->version_checked = $wp_version;
+    }
+
+    // Update last_checked for current to prevent multiple blocking requests if request hangs
+    $current->last_checked = time();
+    set_site_transient( 'wpdbab_update_core', $current );
+
     $php_version = phpversion();
 
     $locale = apply_filters( 'core_version_check_locale', get_locale() );
