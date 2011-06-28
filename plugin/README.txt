@@ -52,7 +52,7 @@ web.config urlrewrite rules if your webserver supports it).
 
 What this does NOT mean
 
-1. You must have the plugin files in place BEFORE installing, and you must upgrade
+1. You must have the plugin files in place BEFORE installing, and you SHOULD upgrade
 the WordPress Database Abstraction Plugin to a version that supports the version of
 WordPress you want to run BEFORE upgrading WordPress Core.
 

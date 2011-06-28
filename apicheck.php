@@ -6,7 +6,7 @@
  * @author Anthony Gentile
  *
  */
-$current_version = '3.1.0';
+$current_version = '3.1.3';
 $current_locale = 'en_US';
 
 if (isset($_GET['version']) && trim($_GET['version']) != '') {
@@ -31,6 +31,6 @@ if ($current_version == $version) {
 header('Content-type: text/plain');
 echo $status . "\r\n";
 echo 'http://wordpress.visitmix.com/download/' . "\r\n";
-echo 'http://downloads.sourceforge.net/project/wp-sqlsrv/distribution/wp-db-abstraction-1.0.1.zip?use_mirror=iweb' . "\r\n";
+echo 'http://downloads.sourceforge.net/project/wp-sqlsrv/distribution/wp-db-abstraction-1.1.0.zip?use_mirror=iweb' . "\r\n";
 echo $current_version. "\r\n";
 echo $current_locale;

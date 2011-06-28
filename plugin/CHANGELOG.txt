@@ -1,3 +1,15 @@
+== 1.1.0 - 6/??/2011 ==
+
+* New method of stripping out strings before translation
+* drivers extend sql translation that extends wpdb
+* mysqli driver added
+* Drivers cleaned up and code simplified
+* Issues with sqlsrv and datetime objects, and with integrated windows auth are now fixed
+* Some translation fixes for various plugins
+* API ping is now cached
+* Error if fields_map file cannot be written to
+* Packaged example fields_map file for installations that failed
+
 == 1.0.1 - 3/1/2011 ==
 
 * Fix for USING join for categories
