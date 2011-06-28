@@ -117,7 +117,7 @@ class SQL_Translations extends wpdb
      * @var array
      */
     var $translation_changes = array();
-    
+
     /**
      * Azure
      * Are we dealing with a SQL Azure DB?
@@ -149,15 +149,6 @@ class SQL_Translations extends wpdb
      * @var mixed
      */
     var $following_query = false;
-    
-    /**
-     * Should we verify update/insert queries?
-     *
-     * @since 2.8.5
-     * @access public
-     * @var mixed
-     */
-    var $verify = false;
 
     /**
      * For our very evil callback loop
@@ -168,6 +159,11 @@ class SQL_Translations extends wpdb
      * For our very evil callback loop
      */
     var $preg_data = array();
+
+    /**
+     * Original query string
+     */
+    var $preg_original;
 
     /**
      * Helper function used with preg_replace_callback to store strings
@@ -195,13 +191,15 @@ class SQL_Translations extends wpdb
      */
     function translate($query)
     {
+        $this->preg_original = $query = trim($query);
+
         if (empty($this->fields_map)) {
             $this->fields_map = new Fields_map();
         }
 
         $this->limit = array();
 
-        $this->set_query_type(trim($query));
+        $this->set_query_type($query);
 
         $this->preceeding_query = false;
         $this->following_query = false;
@@ -229,8 +227,6 @@ class SQL_Translations extends wpdb
             $this->preg_data = array();
             return $query;
         }
-
-        $query = trim($query);
 
         $sub_funcs = array(
             'translate_general',
@@ -265,9 +261,13 @@ class SQL_Translations extends wpdb
             $query = $this->on_duplicate_key($query);
             $query = $this->split_insert_values($query);
         }
-        $query = vsprintf($query, $this->preg_data);
+        if (!empty($this->preg_data)) {
+            $query = vsprintf($query, $this->preg_data);
+        }
         $this->preg_data = array();
 
+        // debug code
+        // file_put_contents(dirname(__FILE__) . '/translate.log', $this->preg_original . PHP_EOL . $query . PHP_EOL . PHP_EOL, FILE_APPEND);
         return $query;
     }
     
@@ -581,12 +581,12 @@ class SQL_Translations extends wpdb
      */
     function translate_specific($query)
     {
-        if ($query == "SELECT COUNT(NULLIF(meta_value LIKE '%administrator%', FALSE) as Computed), "
-                        . "COUNT(NULLIF(meta_value LIKE '%editor%', FALSE) as Computed), "
-                        . "COUNT(NULLIF(meta_value LIKE '%author%', FALSE) as Computed), "
-                        . "COUNT(NULLIF(meta_value LIKE '%contributor%', FALSE) as Computed), "
-                        . "COUNT(NULLIF(meta_value LIKE '%subscriber%', FALSE) as Computed), "
-                        . "COUNT(*) as Computed FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities'") {
+        if ($this->preg_original == "SELECT COUNT(NULLIF(`meta_value` LIKE '%administrator%', FALSE)), "
+                        . "COUNT(NULLIF(`meta_value` LIKE '%editor%', FALSE)), "
+                        . "COUNT(NULLIF(`meta_value` LIKE '%author%', FALSE)), "
+                        . "COUNT(NULLIF(`meta_value` LIKE '%contributor%', FALSE)), "
+                        . "COUNT(NULLIF(`meta_value` LIKE '%subscriber%', FALSE)), "
+                        . "COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key = '" . $this->prefix . "capabilities'") {
             $query = "SELECT 
     (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%administrator%') as ca, 
     (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%editor%') as cb, 
@@ -594,8 +594,9 @@ class SQL_Translations extends wpdb
     (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%contributor%') as cd, 
     (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%subscriber%') as ce, 
     COUNT(*) as c FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities'";
-        } 
-        
+            $this->preg_data = array();
+        }
+
         if (stristr($query, "SELECT DISTINCT TOP 50 (" . $this->prefix . "users.ID) FROM " . $this->prefix . "users") !== FALSE) {
             $query = str_ireplace(
                 "SELECT DISTINCT TOP 50 (" . $this->prefix . "users.ID) FROM", 
@@ -877,36 +878,30 @@ class SQL_Translations extends wpdb
         $date_fields = array();
         $date_fields_map = $this->fields_map->by_type('date');
         foreach ($fields as $key => $field ) {
-                $field = trim($field);
+            $field = trim($field);
 
-                if ( in_array($field, $date_fields_map) ) {
-                        $date_fields[] = array('pos' => $key, 'field' => $field);
-                }
+            if ( in_array($field, $date_fields_map) ) {
+                $date_fields[] = array('pos' => $key + 1, 'field' => $field); // increment position because preg_data is 1 indexed
+            }
         }
 
         // we have date fields to check
         if ( count($date_fields) > 0 ) {
-                // we need to get the values
-                $values_pos = stripos($query, 'VALUES');
-                $first_paren = stripos($query, '(', $values_pos);
-                $last_paren = $this->get_matching_paren($query, ($first_paren + 1));
-                $values = explode(',',substr($query, ($first_paren+1), ($last_paren-($first_paren+1))));
-                foreach ( $date_fields as $df ) {
-                        $v = trim($values[$df['pos']]);
-                        $quote = ( stripos($v, "'0000-00-00 00:00:00'") === 0 || $v === "''" ) ? "'" : '';
-                        if ( stripos($v, '0000-00-00 00:00:00') === 0
-                                || stripos($v, "'0000-00-00 00:00:00'") === 0
-                                || $v === "''" ) {
-                                if ( stripos($df['field'], 'gmt') > 0 ) {
-                                        $v = $quote.gmdate('Y-m-d H:i:s').$quote;
-                                } else {
-                                        $v = $quote.date('Y-m-d H:i:s').$quote;
-                                }
-                        }
-                        $values[$df['pos']] = $v;
+            // values are in the preg_data array, we'll fix them there
+            foreach ( $date_fields as $df ) {
+                $v = $this->preg_data[$df['pos']];
+                $quote = ( stripos($v, "'0000-00-00 00:00:00'") === 0 || $v === "''" ) ? "'" : '';
+                if ( stripos($v, '0000-00-00 00:00:00') === 0
+                    || stripos($v, "'0000-00-00 00:00:00'") === 0
+                    || $v === "''" ) {
+                    if ( stripos($df['field'], 'gmt') > 0 ) {
+                        $v = $quote . gmdate('Y-m-d H:i:s') . $quote;
+                    } else {
+                        $v = $quote . date('Y-m-d H:i:s') . $quote;
+                    }
                 }
-                $str = implode(',', $values);
-                $query = substr_replace($query, $str, ($first_paren+1), ($last_paren-($first_paren+1)));
+                $this->preg_data[$df['pos']] = $v;
+            }
         }
  
         return $query;
