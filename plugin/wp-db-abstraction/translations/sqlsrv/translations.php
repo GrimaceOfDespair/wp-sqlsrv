@@ -173,29 +173,6 @@ class SQL_Translations extends wpdb
     var $prefix = '';
 
     /**
-     * php4 style call to constructor.
-     * 
-     * @since 2.7.1
-     *
-     */
-    function SQL_Translations()
-    {
-        return $this->__construct();
-    }
-    
-    /**
-     * Assign fields_map as a new Fields_map object
-     *
-     * PHP5 style constructor for compatibility with PHP5.
-     *
-     * @since 2.7.1
-     */
-    function __construct()
-    {
-        $this->fields_map = new Fields_map();
-    }
-
-    /**
      * MySQL > MSSQL Query Translation
      * Processes smaller translation sub-functions
      *
@@ -207,6 +184,10 @@ class SQL_Translations extends wpdb
      */
     function translate($query)
     {
+        if (empty($this->fields_map)) {
+            $this->fields_map = new Fields_map();
+        }
+
         $this->limit = array();
         
         $this->set_query_type(trim($query));

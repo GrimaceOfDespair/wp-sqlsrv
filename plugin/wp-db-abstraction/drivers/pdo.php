@@ -342,8 +342,8 @@ class pdo_wpdb extends SQL_Translations {
             $dsn[] = 'charset=' . $this->charset;
             $dsn = $this->pdo_type . ':' . implode(';', $dsn);
         } else {
-            $dsn = $this->pdo_type . ':' . $this->dbhost;
-            $connection_info['Database'] = $details[ 'db_name' ];
+            $dsn = $this->pdo_type . ':Server=' . $this->dbhost;
+            $connection_info['Database'] = $this->dbname;
         }
 
         // Is this SQL Azure?
@@ -362,7 +362,7 @@ class pdo_wpdb extends SQL_Translations {
             }
         }
 
-        if (!$this->dbh ) {
+        if (!is_object($this->dbh)) {
             $this->bail( sprintf( /*WP_I18N_DB_CONN_ERROR*/"
 <h1>Error establishing a database connection</h1>
 <p>This either means that the username and password information in your <code>wp-config.php</code> file is incorrect or we can't contact the database server at <code>%s</code>. This could mean your host's database server is down.</p>
