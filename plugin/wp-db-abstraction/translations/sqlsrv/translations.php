@@ -158,19 +158,30 @@ class SQL_Translations extends wpdb
      * @var mixed
      */
     var $verify = false;
-    
-        /**
-     * WordPress table prefix
-     *
-     * You can set this to have multiple WordPress installations
-     * in a single database. The second reason is for possible
-     * security precautions.
-     *
-     * @since 0.71
-     * @access private
-     * @var string
+
+    /**
+     * For our very evil callback loop
      */
-    var $prefix = '';
+    var $preg_location = 1;
+
+    /**
+     * For our very evil callback loop
+     */
+    var $preg_data = array();
+
+    /**
+     * Helper function used with preg_replace_callback to store strings
+     * we strip out and replace with a sprintf compatible placeholder
+     */
+    function strip_strings($matches)
+    {
+        $location = $this->preg_location;
+        $this->preg_location++;
+        $this->preg_data[$location] = $matches[0]; // store with quotes
+        $string = '%' . $location . '$s';
+
+        return $string;
+    }
 
     /**
      * MySQL > MSSQL Query Translation
@@ -189,9 +200,9 @@ class SQL_Translations extends wpdb
         }
 
         $this->limit = array();
-        
+
         $this->set_query_type(trim($query));
-        
+
         $this->preceeding_query = false;
         $this->following_query = false;
 
@@ -203,6 +214,10 @@ class SQL_Translations extends wpdb
             $this->prepared = FALSE;
         }
 
+        // strip out any quoted strings and store them, replace with sprintf placeholders
+        $query = preg_replace_callback("!'([^'\\\]*(\\\'[^'\\\]*)*)'!", array($this, 'strip_strings'), $query);
+        $this->preg_location = 1;
+
         // Do we have serialized arguments?
         if ( strripos($query, '--SERIALIZED') !== FALSE ) {
             $query = str_replace('--SERIALIZED', '', $query);
@@ -210,6 +225,8 @@ class SQL_Translations extends wpdb
                 $query = $this->on_duplicate_key($query);
             }
             $query = $this->translate_general($query);
+            $query = vsprintf($query, $this->preg_data);
+            $this->preg_data = array();
             return $query;
         }
 
@@ -248,19 +265,8 @@ class SQL_Translations extends wpdb
             $query = $this->on_duplicate_key($query);
             $query = $this->split_insert_values($query);
         }
-        if ( $this->prepared && $this->insert_query && $this->verify ) {
-            if ( is_array($query) ) {
-                foreach ($query as $k => $v) {
-                    $query[$k] = $this->verify_insert($v);
-                }
-            } else {
-                $query = $this->verify_insert($query);
-            }
-        }
-
-        if ( $this->update_query && $this->verify ) {
-            $query = $this->verify_update($query);
-        }
+        $query = vsprintf($query, $this->preg_data);
+        $this->preg_data = array();
 
         return $query;
     }
@@ -487,7 +493,6 @@ class SQL_Translations extends wpdb
                         // find a better way to get columns (field mapping doesn't grab all)
                         $query = "INSERT INTO $table (term_id,name,slug,term_group) SELECT $to,name,slug,term_group FROM $table WHERE $pid = $from";
                         $this->following_query = array("DELETE $table WHERE $pid = $from","SET IDENTITY_INSERT $table OFF");
-                        $this->verify = false;
                     }
                 }
             }
@@ -1415,135 +1420,6 @@ class SQL_Translations extends wpdb
             return $query;
         }
         return $arr;
-    }
-
-    /**
-     * Check query to make sure translations weren't made to INSERT query values
-     * If so replace translation with original data.
-     * E.G. INSERT INTO wp_posts (wp_title) VALUES ('SELECT * FROM wp_posts LIMIT 1');
-     * The translations may change the value data to SELECT TOP 1 FROM wp_posts...in this case
-     * we don't want that to happen.
-     *
-     * @since 2.7.1
-     *
-     * @param string $query Query coming in
-     *
-     * @return string Verified Query
-     */
-    function verify_insert($query)
-    {
-        $map_fields = $this->fields_map->by_type('ntext') + $this->fields_map->by_type('nvarchar');
-
-        $first_paren = stripos($query, '(', 0);
-        $last_paren = $this->get_matching_paren($query, $first_paren + 1);
-        $cols = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
-        $values_pos = stripos($query, 'VALUES');
-        $first_paren = stripos($query, '(', $values_pos);
-        $last_paren = $this->get_matching_paren($query, $first_paren + 1);
-        $values = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
-
-        $arr = array();
-        foreach ( $values as $k => $value ) {
-            if (isset($cols[$k])) {
-                foreach ($map_fields as $text_field) {
-                    if (trim($cols[$k]) == $text_field) {
-                        $arr[] = $k;
-                    }
-                }
-            }
-        }
-        $str = '';
-        foreach ($values as $k => $value) {
-            $val = trim($value);
-            $end = strlen($val) - 1;
-            if (in_array($k, $arr) && $val[0] == "'" && $val[$end] == "'") {
-                $str .= 'N' . trim($value) . ',';
-            } else {
-                $str .= $value . ',';
-            }
-        }
-        $str = rtrim($str, ',');
-        $query = substr_replace($query, $str, ($first_paren + 1), ($last_paren - ($first_paren + 1)));
-
-        if ( count($this->prepare_args) !== count($values) ) {
-            return $query;
-        }
-        $i = 0;
-        foreach ( $values as $k => $value ) {
-            $N = '';
-            if (isset($cols[$k])) {
-                foreach ($map_fields as $text_field) {
-                    if (trim($cols[$k]) == $text_field) {
-                        $N = 'N';
-                    }
-                }
-            }
-            $value = trim($value);
-            foreach ($this->prepare_args as $r => $arg) {
-                if ( $k == $i && $arg !== $value ) {
-                    if ( $arg !== '' && $arg !== '0000-00-00 00:00:00' ) {
-                        $values[$k] = $N . "'" . $arg . "'";
-                    }
-                }
-                $i++;
-            }
-        }
-        $str = implode(',', $values);
-        $first_paren = stripos($query, '(', 0);
-        $last_paren = $this->get_matching_paren($query, $first_paren + 1);
-        $cols = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
-        $values_pos = stripos($query, 'VALUES');
-        $first_paren = stripos($query, '(', $values_pos);
-        $last_paren = $this->get_matching_paren($query, $first_paren + 1);
-        $query = substr_replace($query, $str, ($first_paren + 1), ($last_paren - ($first_paren + 1)));
-        return $query;
-    }
-
-    /**
-     * Check query to make sure translations weren't made to UPDATE query values
-     * If so replace translation with original data.
-     * E.G. UPDATE wp_posts SET post_title = 'SELECT * FROM wp_posts LIMIT 1' WHERE post_id = 1;
-     * The translations may change the value data to SELECT TOP 1 FROM wp_posts...in this case
-     * we don't want that to happen
-     *
-     * @since 2.7.1
-     *
-     * @param string $query Query coming in
-     *
-     * @return string Verified Query
-     */
-    function verify_update($query)
-    {
-        $values = array();
-        $keys = array();
-        $map_fields = $this->fields_map->by_type('ntext') + $this->fields_map->by_type('nvarchar');
-        $start = stripos($query, 'SET') + 3;
-        $end = strripos($query, 'WHERE');
-        $sub = substr($query, $start, $end - $start);
-        $arr = explode(', ', $sub);
-        foreach ( $arr as $k => $v ) {
-            $v = trim($v);
-            $st = stripos($v, ' =');
-            $sv = substr($v, 0, $st);
-            $sp = substr($v, $st + 4, -1);
-            $keys[] = $sv;
-            $values[] = str_replace("'", "''", $sp);
-        }
-        
-        foreach ( $values as $y => $vt ) {
-            $n = '';
-            foreach ($map_fields as $text_field) {
-                if (trim($keys[$y]) == $text_field) {
-                    $n = 'N';
-                }
-            }
-            $values[$y] = $keys[$y] . " = $n'" . $vt . "'";
-        }
-
-        $str = implode(', ', $values) . ' ';
-        $query = substr_replace($query, $str, ($start+1), ($end-($start+1)));
-
-        return $query;
     }
 
     /**
