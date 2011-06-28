@@ -24,11 +24,10 @@
  * @subpackage Database
  * @since 0.71
  */
- 
-$pdo_type = explode('_', DB_TYPE);
+
 require_once dirname(dirname(__FILE__)) . 
     DIRECTORY_SEPARATOR . 'translations' . 
-    DIRECTORY_SEPARATOR . $pdo_type[1] . 
+    DIRECTORY_SEPARATOR . $pdo_type . 
     DIRECTORY_SEPARATOR . 'translations.php';
 
 class pdo_wpdb extends SQL_Translations {
@@ -58,6 +57,43 @@ class pdo_wpdb extends SQL_Translations {
      * @var string
      */
     var $pdo_type;
+
+    /**
+     * Connects to the database server and selects a database
+     *
+     * PHP4 compatibility layer for calling the PHP5 constructor.
+     *
+     * @uses wpdb::__construct() Passes parameters and returns result
+     * @since 0.71
+     *
+     * @param string $dbuser MySQL database user
+     * @param string $dbpassword MySQL database password
+     * @param string $dbname MySQL database name
+     * @param string $dbhost MySQL database host
+     */
+    function wpdb( $dbuser, $dbpassword, $dbname, $dbhost, $pdo_type) {
+        return $this->__construct( $dbuser, $dbpassword, $dbname, $dbhost, $pdo_type );
+    }
+
+    /**
+     * Connects to the database server and selects a database
+     *
+     * PHP5 style constructor for compatibility with PHP5. Does
+     * the actual setting up of the class properties and connection
+     * to the database.
+     *
+     * @link http://core.trac.wordpress.org/ticket/3354
+     * @since 2.0.8
+     *
+     * @param string $dbuser MySQL database user
+     * @param string $dbpassword MySQL database password
+     * @param string $dbname MySQL database name
+     * @param string $dbhost MySQL database host
+     */
+    function __construct( $dbuser, $dbpassword, $dbname, $dbhost, $pdo_type ) {
+        $this->pdo_type = $pdo_type;
+        parent::__construct( $dbuser, $dbpassword, $dbname, $dbhost);
+    }
 
     /**
      * Sets the connection's character set.
@@ -199,6 +235,7 @@ class pdo_wpdb extends SQL_Translations {
      *  if there was something to prepare
      */
     function prepare( $query = null ) { // ( $query, *$args )
+
         if ( is_null( $query ) ) {
             return;
         }
@@ -213,6 +250,9 @@ class pdo_wpdb extends SQL_Translations {
             if (is_serialized($arg)) {
                 $flag = '--SERIALIZED';
             }
+        }
+        if ($this->pdo_type == 'mysql') {
+            $flag = '';
         }
         $query = str_replace("'%s'", '%s', $query); // in case someone mistakenly already singlequoted it
         $query = str_replace('"%s"', '%s', $query); // doublequote unquoting
@@ -281,9 +321,6 @@ class pdo_wpdb extends SQL_Translations {
      * @since 3.0.0
      */
     function db_connect() {
-        global $pdo_type;
-
-        $this->pdo_type = $pdo_type[1];
 
         if (get_magic_quotes_gpc()) {
             $this->dbhost = trim(str_replace("\\\\", "\\", $this->dbhost));
@@ -302,25 +339,30 @@ class pdo_wpdb extends SQL_Translations {
                 $dsn[] = 'host=' . $this->dbhost;
             }
             $dsn[] = 'dbname=' . $this->dbname;
+            $dsn[] = 'charset=' . $this->charset;
             $dsn = $this->pdo_type . ':' . implode(';', $dsn);
         } else {
-            $dsn = $this->pdo_type . ':' . $this->db;
+            $dsn = $this->pdo_type . ':' . $this->dbhost;
             $connection_info['Database'] = $details[ 'db_name' ];
         }
 
         // Is this SQL Azure?
-        if (stristr($details[ 'db_host' ], 'database.windows.net') !== false) {
+        if (stristr($this->dbhost, 'database.windows.net') !== false) {
             // Need to turn off MultipleActiveResultSets, this requires
             // Sql Server Driver for PHP 1.1+ (1.0 doesn't support this property)
             $connection_info['MultipleActiveResultSets'] = false; 
             $this->azure = true;
         }
 
+        try {
+            $this->dbh = new PDO($dsn, $this->dbuser, $this->dbpassword, $connection_info);
+        } catch (Exception $e) {
+            if (WP_DEBUG) {
+                throw $e;
+            }
+        }
 
-
-        $this->$dbhname = new PDO($dsn, $details[ 'db_user' ], $details[ 'db_password' ], $connection_info);
-
-        if (!$this->$dbhname ) {
+        if (!$this->dbh ) {
             $this->bail( sprintf( /*WP_I18N_DB_CONN_ERROR*/"
 <h1>Error establishing a database connection</h1>
 <p>This either means that the username and password information in your <code>wp-config.php</code> file is incorrect or we can't contact the database server at <code>%s</code>. This could mean your host's database server is down.</p>
@@ -330,18 +372,17 @@ class pdo_wpdb extends SQL_Translations {
     <li>Are you sure that the database server is running?</li>
 </ul>
 <p>If you're unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href='http://wordpress.org/support/'>WordPress Support Forums</a>.</p>
-"/*/WP_I18N_DB_CONN_ERROR*/, $details['db_host'] ), 'db_connect_fail' );
+"/*/WP_I18N_DB_CONN_ERROR*/, $this->dbhost ), 'db_connect_fail' );
         }
-        
-        $this->$dbhname->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
-        $this->$dbhname->setAttribute(PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_UTF8);
+
+        $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+        $this->dbh->setAttribute(PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_UTF8);
         // We keep error mode on silent or else we get a lot of barking during installation
         // because wordpress tries to select from tables that don't exist to see whether
         // installation is necessary or not.
-        //$this->$dbhname->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
-        $this->$dbhname->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-        
-        $this->select( $details[ 'db_name' ], $this->$dbhname );
+        //$this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+        $this->dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $this->ready = true;
     }
 
     /**
@@ -355,6 +396,7 @@ class pdo_wpdb extends SQL_Translations {
      * @return int|false Number of rows affected/selected or false on error
      */
     function query( $query, $translate = true ) {
+
         if ( ! $this->ready )
             return false;
 

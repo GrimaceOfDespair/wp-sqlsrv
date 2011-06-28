@@ -6,6 +6,4 @@ class SQL_Translations extends wpdb
     function translate($query) {
         return $query;
     }
-
-    function __construct() { }
 }
