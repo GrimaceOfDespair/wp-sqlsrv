@@ -336,7 +336,7 @@ class sqlsrv_wpdb extends SQL_Translations {
             $query = $this->translate($query);
             $this->previous_query = $query;
         }
-        
+
         if ($this->preceeding_query !== false) {
             if (is_array($this->preceeding_query)) {
                 foreach ($this->preceeding_query as $p_query) {

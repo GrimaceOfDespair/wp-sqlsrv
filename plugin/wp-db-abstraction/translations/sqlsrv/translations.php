@@ -257,14 +257,16 @@ class SQL_Translations extends wpdb
                 $this->translation_changes[] = $old_query;
             }
         }
-        if ( $this->insert_query ) {
-            $query = $this->on_duplicate_key($query);
-            $query = $this->split_insert_values($query);
-        }
+
         if (!empty($this->preg_data)) {
             $query = vsprintf($query, $this->preg_data);
         }
         $this->preg_data = array();
+
+        if ( $this->insert_query ) {
+            $query = $this->on_duplicate_key($query);
+            $query = $this->split_insert_values($query);
+        }
 
         // debug code
         // file_put_contents(dirname(__FILE__) . '/translate.log', $this->preg_original . PHP_EOL . $query . PHP_EOL . PHP_EOL, FILE_APPEND);
@@ -397,10 +399,11 @@ class SQL_Translations extends wpdb
 
         // REGEXP - not supported in TSQL
         if ( stripos($query, 'REGEXP') > 0 ) {
-                if ( $this->delete_query && stripos($query, '^rss_[0-9a-f]{32}(_ts)?$') > 0 ) {
-                        $start_pos = stripos($query, 'REGEXP');
-                        $query = substr_replace($query, "LIKE 'rss_'", $start_pos);
-                }
+            if ( $this->delete_query && stripos($this->preg_original, '^rss_[0-9a-f]{32}(_ts)?$') > 0 ) {
+                $start_pos = stripos($this->preg_original, 'REGEXP');
+                $query = substr_replace($this->preg_original, "LIKE 'rss_'", $start_pos);
+                $this->preg_data = array();
+            }
         }
 
         // LEN not LENGTH
@@ -966,7 +969,13 @@ class SQL_Translations extends wpdb
         if ( !$this->create_query ) {
             return $query;
         }
-        
+
+        // This needs all the data to work with
+        if (!empty($this->preg_data)) {
+            $query = vsprintf($query, $this->preg_data);
+        }
+        $this->preg_data = array();
+
         // fix enum as it doesn't exist in T-SQL
         if (stripos($query, 'enum(') !== false) {
             $enums = array_reverse($this->stripos_all($query, 'enum('));
