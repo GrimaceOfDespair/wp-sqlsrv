@@ -91,7 +91,6 @@ foreach($drivers as $extension) {
 		}
 	}
 }
-
 if ($validated_database == false)
 	wp_die('Your PHP installation appears to be missing all the database extensions (' . implode(', ', $drivers) . ') which are supported by WP Db Abstraction Plugin.');
 
@@ -179,7 +178,7 @@ switch($step) {
 				foreach($valid_drivers as $option) {
 					if ($option == 'mysql') {
 						echo "<option value=\"$option\">MySQL</option>\n";
-					if ($option == 'mysqli') {
+					} elseif ($option == 'mysqli') {
 						echo "<option value=\"$option\">MySQLi</option>\n";
 					} elseif ($option == 'sqlsrv') {
 						echo "<option value=\"$option\">SQL Server using MS PHP driver</option>\n";

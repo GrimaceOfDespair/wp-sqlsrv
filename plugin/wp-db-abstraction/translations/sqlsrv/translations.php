@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . '/fields_map.php');
  * @package MySQL_Translations
  * @author A.Garcia & A.Gentile
  * */
-class SQL_Translations
+class SQL_Translations extends wpdb
 {
     /**
      * Field Mapping

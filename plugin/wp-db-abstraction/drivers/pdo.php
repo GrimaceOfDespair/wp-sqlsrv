@@ -78,8 +78,8 @@ class pdo_wpdb extends SQL_Translations {
                 $collate = $this->collate;
             if ( $this->has_cap( 'collation', $dbh ) && !empty( $charset ) ) {
                 $query = $this->prepare( 'SET NAMES %s', $charset );
-                    if ( ! empty( $collate ) )
-                            $query .= $this->prepare( ' COLLATE %s', $collate );
+                if ( ! empty( $collate ) ) {
+                    $query .= $this->prepare( ' COLLATE %s', $collate );
                     $dbh->query( $query );
                 }
             }
