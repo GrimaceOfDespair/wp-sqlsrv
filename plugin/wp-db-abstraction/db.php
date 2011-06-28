@@ -90,7 +90,8 @@ EOD;
 function wp_db_abstraction_create_wpdb ($type, $user, $password, $name, $host) {
 
     if (stristr($type, 'pdo_') !== FALSE) {
-            $type = 'pdo';
+        $pdo_type = str_replace('pdo_', '', $type);
+        $type = 'pdo';
     }
 
     require_once(dirname(__FILE__) . 
@@ -101,6 +102,9 @@ function wp_db_abstraction_create_wpdb ($type, $user, $password, $name, $host) {
 
     $class = $type . '_wpdb';
 
+    if (isset($pdo_type)) {
+        return new $class($user, $password, $name, $host, $pdo_type);
+    }
     return new $class($user, $password, $name, $host);
 }
 
