@@ -330,6 +330,15 @@ class SQL_Translations extends wpdb
             $param = substr($query, 17, $end_pos - 17);
             $query = 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE ' . $param;
         }
+        // DESCRIBE - this is pretty darn close to mysql equiv, however it will need to have a flag to modify the result set
+        // this and SHOW INDEX FROM are used in WP upgrading. The problem is that WP will see the different data types and try
+        // to alter the table thinking an upgrade is necessary. So the result set from this query needs to be modified using
+        // the field_mapping to revert column types back to their mysql equiv to fool WP.
+        if ( stripos($query, 'DESCRIBE ') === 0 ) {
+            $table = rtrim(substr($query, 9), ';');
+            $query = $this->describe($table);
+        }
+
         // SET NAMES doesn't exist in T-SQL
         if ( stristr($query, "set names 'utf8'") !== FALSE ) {
             $query = "";
@@ -355,7 +364,39 @@ class SQL_Translations extends wpdb
                       WHERE sys.sysobjects.type = 'u'   
                        AND sys.sysobjects.name = '{$table}'";
         }
-        
+
+        // SHOW INDEX FROM tablename
+        if ( stripos($query, 'SHOW INDEX FROM ') === 0 ) {
+            $table = rtrim(substr($query, 16), ';');
+            $query = "select
+                    t.name AS [Table],
+                    CASE 
+                                WHEN ind.is_unique = 1 THEN 0
+                                ELSE 1
+                        END AS Non_unique,
+                        CASE 
+                            WHEN ind.is_primary_key = 1 THEN 'PRIMARY'
+                            ELSE ind.name
+                        END AS Key_name,
+                        col.name AS Column_name,
+                   NULL as Sub_part
+                from 
+                    sys.indexes ind
+                inner join 
+                    sys.index_columns ic on 
+                      ind.object_id = ic.object_id and ind.index_id = ic.index_id
+                inner join
+                    sys.columns col on
+                      ic.object_id = col.object_id and ic.column_id = col.column_id 
+                inner join
+                    sys.tables t on 
+                      ind.object_id = t.object_id
+                where
+                    t.name = '{$table}'
+                order by
+                    t.name, ind.name, ind.index_id, ic.index_column_id";
+        }
+
         // USE INDEX
         if ( stripos($query, 'USE INDEX (') !== FALSE) {
             $start_pos = stripos($query, 'USE INDEX (');
@@ -376,16 +417,6 @@ class SQL_Translations extends wpdb
             }
             $params = implode(',', $params);
             $query = substr_replace($query, 'WITH (INDEX(' . $params . '))', $start_pos, ($end_pos + 1) - $start_pos);
-        }
-        
-        // DESCRIBE - this is pretty darn close to mysql equiv, however it will need to have a flag to modify the result set
-        // this and SHOW INDEX FROM are used in WP upgrading. The problem is that WP will see the different data types and try
-        // to alter the table thinking an upgrade is necessary. So the result set from this query needs to be modified using
-        // the field_mapping to revert column types back to their mysql equiv to fool WP.
-        if ( stripos($query, 'DESCRIBE ') === 0 ) {
-            return $query;
-            $table = substr($query, 9);
-            $query = $this->describe($table);
         }
 
         // DROP TABLES
@@ -966,7 +997,7 @@ class SQL_Translations extends wpdb
      */
     function translate_create_queries($query)
     {
-        if ( !$this->create_query ) {
+        if ( !$this->create_query && !$this->alter_query) {
             return $query;
         }
 
@@ -1025,6 +1056,16 @@ class SQL_Translations extends wpdb
             'index(',
         );
 
+        // if alter table query - ADD COLUMN needs to become simply ADD
+        if ($this->alter_query) {
+            if (( stripos($query, 'ALTER COLUMN') > 0) ||
+                 (stripos($query, 'CHANGE COLUMN') > 0) ||
+                 (stripos($query, 'ADD KEY') > 0)) {
+                $query = '';
+            }
+            $query = str_replace('ADD COLUMN', 'ADD', $query);
+        }
+
         foreach ( $fields as $field ) {
             // reverse so that when we make changes it wont effect the next change.
             $start_positions = array_reverse($this->stripos_all($query, $field));
@@ -1044,10 +1085,12 @@ class SQL_Translations extends wpdb
         // strip unsigned
         $query = str_ireplace("unsigned ", '', $query);
 
-        // strip collation, engine type, etc from end of query
-        $pos = stripos($query, '(', stripos($query, 'TABLE '));
-        $end = $this->get_matching_paren($query, $pos + 1);
-        $query = substr_replace($query, ');', $end);
+        if ($this->create_query) {
+            // strip collation, engine type, etc from end of query
+            $pos = stripos($query, '(', stripos($query, 'TABLE '));
+            $end = $this->get_matching_paren($query, $pos + 1);
+            $query = substr_replace($query, ');', $end);
+        }
 
         $query = str_ireplace("DEFAULT CHARACTER SET utf8", '', $query);
         $query = str_ireplace("CHARACTER SET utf8", '', $query);
@@ -1088,17 +1131,19 @@ class SQL_Translations extends wpdb
         }
 
         $keys = array();
-        $table_pos = stripos($query, ' TABLE ') + 6;
-        $table = substr($query, $table_pos, stripos($query, '(', $table_pos) - $table_pos);
-        $table = trim($table);
-        
-        $reserved_words = array('public');
-        // get column names to check for reserved words to encapsulate with [ ]
-        foreach($this->fields_map->read() as $table_name => $table_fields) {
-            if ($table_name == $table && is_array($table_fields)) {
-                foreach ($table_fields as $field => $field_meta) {
-                    if (in_array($field, $reserved_words)) {
-                        $query = str_ireplace($field, "[{$field}]", $query);
+        if ($this->create_query) {
+            $table_pos = stripos($query, ' TABLE ') + 6;
+            $table = substr($query, $table_pos, stripos($query, '(', $table_pos) - $table_pos);
+            $table = trim($table);
+            
+            $reserved_words = array('public');
+            // get column names to check for reserved words to encapsulate with [ ]
+            foreach($this->fields_map->read() as $table_name => $table_fields) {
+                if ($table_name == $table && is_array($table_fields)) {
+                    foreach ($table_fields as $field => $field_meta) {
+                        if (in_array($field, $reserved_words)) {
+                            $query = str_ireplace($field, "[{$field}]", $query);
+                        }
                     }
                 }
             }
@@ -1383,6 +1428,12 @@ class SQL_Translations extends wpdb
                 $first_paren = stripos($query, '(', $values_pos);
                 $last_paren = $this->get_matching_paren($query, $first_paren + 1);
                 $values = explode(',', substr($query, ($first_paren + 1), ($last_paren-($first_paren + 1))));
+                if (!isset($values[1])) {
+                    $values[1] = '';
+                }
+                if (!isset($values[2])) {
+                    $values[2] = 'no';
+                }
                 // change this to use mapped fields
                 $update = 'UPDATE ' . $table . ' SET option_value = ' . $values[1] . ', autoload = ' . $values[2] . 
                     ' WHERE option_name = ' . $values[0];
@@ -1474,12 +1525,21 @@ class SQL_Translations extends wpdb
                                THEN 'UNI'
                 ELSE ''
             END AS [Key]
-            ,ISNULL((
-                SELECT TOP(1)
-                    dc.definition
-                FROM sys.default_constraints AS dc
-                WHERE dc.parent_column_id = c.column_id AND c.object_id = dc.parent_object_id)
-            ,'') AS [Default]
+            ,CASE
+                WHEN '(getdate())' = ISNULL((
+                                        SELECT TOP(1)
+                                            dc.definition
+                                        FROM sys.default_constraints AS dc
+                                        WHERE dc.parent_column_id = c.column_id AND c.object_id = dc.parent_object_id)
+                                    , '') THEN '0000-00-00 00:00:00'
+                ELSE
+                    ISNULL((
+                        SELECT TOP(1)
+                            dc.definition
+                        FROM sys.default_constraints AS dc
+                        WHERE dc.parent_column_id = c.column_id AND c.object_id = dc.parent_object_id)
+                    , '')
+            END AS [Default]
             ,CASE
                 WHEN EXISTS (
                     SELECT
@@ -1494,17 +1554,12 @@ class SQL_Translations extends wpdb
             SELECT
                 t.name AS n1
                 ,CASE
-                    -- Types with length
                     WHEN c.max_length > 0 AND t.name IN ('varchar', 'char', 'varbinary', 'binary') THEN '(' + CAST(c.max_length AS VARCHAR) + ')'
                     WHEN c.max_length > 0 AND t.name IN ('nvarchar', 'nchar') THEN '(' + CAST(c.max_length/2 AS VARCHAR) + ')'
                     WHEN c.max_length < 0 AND t.name IN ('nvarchar', 'varchar', 'varbinary') THEN '(max)'
-                    -- Types with precision & scale
                     WHEN t.name IN ('decimal', 'numeric') THEN '(' + CAST(c.precision AS VARCHAR) + ',' + CAST(c.scale AS VARCHAR) + ')'
-                    -- Types with only precision
                     WHEN t.name IN ('float') THEN '(' + CAST(c.precision AS VARCHAR) + ')'
-                    -- Types with only scale
                     WHEN t.name IN ('datetime2', 'time', 'datetimeoffset') THEN '(' + CAST(c.scale AS VARCHAR) + ')'
-                    -- The rest take no arguments
                     ELSE ''
                 END AS length_string
                 ,*
