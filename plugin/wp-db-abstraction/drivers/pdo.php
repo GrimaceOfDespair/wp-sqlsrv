@@ -329,7 +329,7 @@ class pdo_wpdb extends SQL_Translations {
         $dsn = array();
 
         /* Specify the server and connection string attributes. */
-        $connection_info = array();
+        $pdo_attributes = array();
 
         if ($this->pdo_type == 'mysql') {
             if (stristr($this->dbhost, ':')) {
@@ -342,27 +342,26 @@ class pdo_wpdb extends SQL_Translations {
             $dsn[] = 'charset=' . $this->charset;
             $dsn = $this->pdo_type . ':' . implode(';', $dsn);
         } else {
-            $dsn = $this->pdo_type . ':Server=' . $this->dbhost;
-            $connection_info['Database'] = $this->dbname;
+            $dsn = $this->pdo_type . ':Server=' . $this->dbhost . ';Database=' . $this->dbname;
         }
 
         // Is this SQL Azure?
         if (stristr($this->dbhost, 'database.windows.net') !== false) {
             // Need to turn off MultipleActiveResultSets, this requires
             // Sql Server Driver for PHP 1.1+ (1.0 doesn't support this property)
-            $connection_info['MultipleActiveResultSets'] = false; 
+            $dsn .= ';MultipleActiveResultSets=false'; 
             $this->azure = true;
         }
 
         try {
-            $this->dbh = new PDO($dsn, $this->dbuser, $this->dbpassword, $connection_info);
+            $this->dbh = new PDO($dsn, $this->dbuser, $this->dbpassword, $pdo_attributes);
         } catch (Exception $e) {
             if (WP_DEBUG) {
                 throw $e;
             }
         }
 
-        if (!is_object($this->dbh)) {
+        if (!isset($this->dbh) || !is_object($this->dbh)) {
             $this->bail( sprintf( /*WP_I18N_DB_CONN_ERROR*/"
 <h1>Error establishing a database connection</h1>
 <p>This either means that the username and password information in your <code>wp-config.php</code> file is incorrect or we can't contact the database server at <code>%s</code>. This could mean your host's database server is down.</p>
@@ -373,6 +372,7 @@ class pdo_wpdb extends SQL_Translations {
 </ul>
 <p>If you're unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href='http://wordpress.org/support/'>WordPress Support Forums</a>.</p>
 "/*/WP_I18N_DB_CONN_ERROR*/, $this->dbhost ), 'db_connect_fail' );
+            return;
         }
 
         $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
