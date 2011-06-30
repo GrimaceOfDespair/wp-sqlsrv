@@ -437,9 +437,13 @@ class SQL_Translations extends wpdb
             }
         }
 
-        // LEN not LENGTH
-        $query = str_replace('LENGTH(', 'LEN(', $query);
-        $query = str_replace('LENGTH (', 'LEN (', $query); 
+        // DATALENGTH == sql servers length == length in bytes
+        $query = str_replace('LENGTH(', 'DATALENGTH(', $query);
+        $query = str_replace('LENGTH (', 'DATALENGTH(', $query); 
+
+        // LEN == sql servers length == length in characters
+        $query = str_replace('CHAR_LENGTH(', 'LEN(', $query);
+        $query = str_replace('CHAR_LENGTH (', 'LEN(', $query);
 
         // TICKS
         $query = str_replace('`', '', $query);
