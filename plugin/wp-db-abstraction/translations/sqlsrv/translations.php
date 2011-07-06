@@ -437,13 +437,15 @@ class SQL_Translations extends wpdb
             }
         }
 
-        // DATALENGTH == sql servers length == length in bytes
-        $query = str_replace('LENGTH(', 'DATALENGTH(', $query);
-        $query = str_replace('LENGTH (', 'DATALENGTH(', $query); 
+        // REMEMBER you must replace char_length first to avoid overwriting datalength
 
         // LEN == sql servers length == length in characters
         $query = str_replace('CHAR_LENGTH(', 'LEN(', $query);
         $query = str_replace('CHAR_LENGTH (', 'LEN(', $query);
+
+        // DATALENGTH == sql servers length == length in bytes
+        $query = str_replace('LENGTH(', 'DATALENGTH(', $query);
+        $query = str_replace('LENGTH (', 'DATALENGTH(', $query); 
 
         // TICKS
         $query = str_replace('`', '', $query);
@@ -453,14 +455,6 @@ class SQL_Translations extends wpdb
             $query = str_ireplace(
                 'SELECT COUNT(DISTINCT(' . $this->prefix . 'users.ID))', 
                 'SELECT COUNT(DISTINCT(' . $this->prefix . 'users.ID)) as Computed', $query);
-        }
-        
-        if (!preg_match('/CHAR_LENGTH\((.*?)\) as/i', $query)) {
-            $query = preg_replace('/CHAR_LENGTH\((.*?)\)/i', 'LEN(\1)', $query);
-        }
-        
-        if (!preg_match('/LENGTH\((.*?)\) as/i', $query)) {
-            $query = preg_replace('/LENGTH\((.*?)\)/i', 'LEN(\1)', $query);
         }
 
         // Computed
