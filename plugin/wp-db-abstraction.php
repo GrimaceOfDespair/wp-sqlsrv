@@ -7,9 +7,9 @@ Description: Data-Access abstraction and SQL abstraction support for Wordpress.
              database connectivity.  Currently supports PDO, sqlsrv, mssql
              and mysql database extensions and sql abstraction for SQL Server.
              Can be easily extended for other database extensions and sql dialects.
-Version: 1.0.1
+Version: 1.1.1
 Author: Anthony Gentile and Elizabeth M Smith
-Author URI:  http://wordpress.visitmix.com/
+Author URI: http://wordpress.visitmix.com/
 License: GPLv2
 */
 
@@ -131,6 +131,7 @@ function wp_db_abstraction_check_core_upgrade() {
  * to avoid polluting global namespace
  */
 function wp_db_abstraction_check_plugin_install() {
+
     /**
      * Check to make sure that this file is in the mu-plugins folder
      */
