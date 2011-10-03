@@ -35,6 +35,11 @@ class Fields_map
      */
     function __construct() {
         $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.php';
+
+        // if the file doesn't exist yet, we'll try to write it out and blow up if we can't
+        if (!file_exists($this->filepath)) {
+            $this->update_for('');
+        }
     }
 
     /**
@@ -190,7 +195,8 @@ class Fields_map
             // two directories up is our error page
             $wp_db_ab_plugin_path = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR
                 . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-            $error_message = 'WP Database Abstraction must write to the wp-content/fields_map.parsed_types.php file located at ' . $this->filepath;
+            $error_message = 'WP Database Abstraction must write to the wp-content/fields_map.parsed_types.php file located at ' . $this->filepath .
+            'Either the file does not exist, or the webserver cannot write to the file';
             include $wp_db_ab_plugin_path . 'error_page.php';
             die;
         }

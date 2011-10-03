@@ -3,7 +3,7 @@
 Plugin Name: WP Db Abstraction
 Plugin URI:  http://sourceforge.net/projects/wp-sqlsrv/
 Description: Database class drop in override file for WP Db Abstraction plugin
-Version: 1.0.1
+Version: 1.1.1
 Author: Anthony Gentile and Elizabeth M Smith
 Author URI:  http://wordpress.visitmix.com/
 License: GPLv2
