@@ -1093,9 +1093,10 @@ class SQL_Translations extends wpdb
             $query = substr_replace($query, ');', $end);
         }
 
+        /* We remove character set and collation stuff because that information is per table in sql server */
         $query = str_ireplace("DEFAULT CHARACTER SET utf8", '', $query);
         $query = str_ireplace("CHARACTER SET utf8", '', $query);
-        
+
         if ( ! empty($this->charset) ) {
             $query = str_ireplace("DEFAULT CHARACTER SET {$this->charset}", '', $query);
         }
@@ -1488,15 +1489,12 @@ class SQL_Translations extends wpdb
      */
     function add_collation($query, $pos)
     {
-        switch (WPLANG) {
-            case 'ru_RU':
-                $collation = 'Cyrillic_General_BIN';
-            break;
-            case 'en_US':
-            default:
-                $collation = 'Latin1_General_BIN';
-            break;
+        if (empty($this->collate)) {
+            $collation = 'database_default';
+        } else {
+            $collation = $this->collate;
         }
+
         $query = substr_replace($query, " COLLATE $collation", $pos, 0);
         return $query;
     }

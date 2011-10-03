@@ -10,11 +10,12 @@ It is an mu (Must-Use) plugin AND also a db.php drop-in.
 
 == Description ==
 
-WP Database Abstraction provides two features, database access abstraction and SQL dialect abstraction.
-This allows 
-This plugin cannot be installed or used as a regular plugin, it must be in the "mu-plugins"
-directory (must use plugins) and in addition to the plugin it contains a "drop-in" to hook
-into Wordpress Database functionality.
+WP Database Abstraction is a plugin to make it possible to run WP on top of MS
+SQL Server or Azure and provides two features, database access abstraction and SQL
+dialect abstraction. This plugin cannot be installed or used as a regular
+plugin, it must be in the "mu-plugins" directory (must use plugins) and in
+addition to the plugin it contains a "drop-in" to hook into WordPress Database
+functionality.
 
 Database Access Abstraction is the way you connect to the database through PHP.
 This plugin allows mysql, mysqli, pdo, sqlsrv or mssql extensions to be used.  PDO has support
@@ -96,6 +97,20 @@ to the name your renamed the other db.php file to)
 For new installs - we package our own wp-config.php creator.  The creation url will be at
 $your_wordpress_url/wp-content/mu-plugins/wp-db-abstraction/setup-config.php  The original
 setup-config.php WILL be redirected after the second step if db.php is in the right place
+
+= Why is collation important when using SQL Server? How do I change the SQL Server Collation used? =
+
+By default, the SQL Server collation used by this plugin is database_default.  This means
+that the default collation defined by the SQL Server install will dictate the collation
+used when creating the sql server tables.
+
+If you need to use a different collation for your installation, you may define DB_COLLATE
+in your wp-config.php file.  For example, defining it to Cyrillic_General_BIN.  Note that this
+will only affect new installations of the plugin.
+
+If you want to change the way an individual table is collated you may use the following example syntax:
+
+ALTER TABLE wp_posts ALTER COLUMN post_content varchar(max)COLLATE Latin1_General_CI_AS
 
 == Changelog ==
 
