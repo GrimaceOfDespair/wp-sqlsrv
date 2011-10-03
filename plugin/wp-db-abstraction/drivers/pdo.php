@@ -254,9 +254,14 @@ class pdo_wpdb extends SQL_Translations {
         if ($this->pdo_type == 'mysql') {
             $flag = '';
         }
+        if ($this->pdo_type == 'sqlsrv') {
+            $prefix = 'N';
+        } else {
+            $prefix = '';
+        }
         $query = str_replace("'%s'", '%s', $query); // in case someone mistakenly already singlequoted it
         $query = str_replace('"%s"', '%s', $query); // doublequote unquoting
-        $query = preg_replace( '|(?<!%)%s|', "'%s'", $query ); // quote the strings, avoiding escaped strings like %%s
+        $query = preg_replace( '|(?<!%)%s|', "$prefix'%s'", $query ); // quote the strings, avoiding escaped strings like %%s
         array_walk($this->prepare_args, array(&$this, 'escape_by_ref'));
         return @vsprintf($query, $this->prepare_args).$flag;
     }
