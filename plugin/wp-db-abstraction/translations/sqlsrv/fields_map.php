@@ -25,7 +25,7 @@ class Fields_map
     function Fields_map() {
         return $this->__construct();
     }
-    
+
     /**
      * Set filepath
      *
@@ -139,7 +139,7 @@ class Fields_map
             array('pattern' => '/varchar(.*)/', 'trans' => 'nvarchar'),
             array('pattern' => '/.*text.*/',    'trans' => 'nvarchar'),
             array('pattern' => '/.*datetime.*/','trans' => 'date'),
-            array('pattern' => '/int(.*)/',     'trans' => 'int'),
+            array('pattern' => '/[big|medium|tiny]*int(.*)/',     'trans' => 'int'),
         );
 
         $res = '';

@@ -620,12 +620,12 @@ class SQL_Translations extends wpdb
                         . "COUNT(NULLIF(`meta_value` LIKE '%subscriber%', FALSE)), "
                         . "COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key = '" . $this->prefix . "capabilities'") {
             $query = "SELECT 
-    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%administrator%') as ca, 
-    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%editor%') as cb, 
-    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%author%') as cc, 
-    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%contributor%') as cd, 
-    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities' AND meta_value LIKE '%subscriber%') as ce, 
-    COUNT(*) as c FROM " . $this->prefix . "usermeta WHERE meta_key LIKE '" . $this->prefix . "capabilities'";
+    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key = '" . $this->prefix . "capabilities' AND meta_value LIKE '%administrator%') as ca, 
+    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key = '" . $this->prefix . "capabilities' AND meta_value LIKE '%editor%') as cb, 
+    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key = '" . $this->prefix . "capabilities' AND meta_value LIKE '%author%') as cc, 
+    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key = '" . $this->prefix . "capabilities' AND meta_value LIKE '%contributor%') as cd, 
+    (SELECT COUNT(*) FROM " . $this->prefix . "usermeta WHERE meta_key = '" . $this->prefix . "capabilities' AND meta_value LIKE '%subscriber%') as ce, 
+    COUNT(*) as c FROM " . $this->prefix . "usermeta WHERE meta_key = '" . $this->prefix . "capabilities'";
             $this->preg_data = array();
         }
 
@@ -701,7 +701,7 @@ class SQL_Translations extends wpdb
 
 
     /**
-     * Replace From UnixTime and now()
+     * Replace From UnixTime, utc_timestamp and now()
      *
      * @since 2.7.1
      *
@@ -714,6 +714,7 @@ class SQL_Translations extends wpdb
         $replacement = 'getdate()';
         $query = preg_replace('/(from_unixtime|unix_timestamp)\s*\(([^\)]*)\)/i', $replacement, $query);
         $query = str_ireplace('NOW()', $replacement, $query);
+        $query = str_ireplace('utc_timestamp()', 'getutcdate()', $query);
 
         // REPLACE dayofmonth which doesn't exist in T-SQL
         $check = $query;
@@ -817,7 +818,7 @@ class SQL_Translations extends wpdb
                     foreach( $this->fields_map->read() as $table => $table_fields ) {
                         if ( is_array($table_fields) ) {
                             foreach ( $table_fields as $field => $field_meta) {
-                                if ($field_meta['type'] == 'ntext') {
+                                if ($field_meta['type'] == 'ntext' || $field_meta['type'] == 'text') {
                                     if ( $v == $table . '.' . $field || $v == $field) {
                                         $match = true;
                                     }
@@ -1083,6 +1084,7 @@ class SQL_Translations extends wpdb
 
         // strip unsigned
         $query = str_ireplace("unsigned ", '', $query);
+        $query = str_ireplace("unsigned,", ',', $query);
 
         if ($this->create_query) {
             // strip collation, engine type, etc from end of query
