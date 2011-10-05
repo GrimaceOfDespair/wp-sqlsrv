@@ -2,11 +2,7 @@
 /*
 Plugin Name: WP Db Abstraction
 Plugin URI:  http://sourceforge.net/projects/wp-sqlsrv/
-Description: Data-Access abstraction and SQL abstraction support for Wordpress.
-             Must be installed as a Must Use plugin, uses db.php drop-in for
-             database connectivity.  Currently supports PDO, sqlsrv, mssql
-             and mysql database extensions and sql abstraction for SQL Server.
-             Can be easily extended for other database extensions and sql dialects.
+Description: Data-Access abstraction and SQL abstraction support for Wordpress. MU (must use) plugin ONLY, do not install as a regular plugin. Please install and upgrade manually, see plugin site for details.  Also requires db.php drop-in. Currently supports PDO, sqlsrv, mssql and mysql database extensions and sql abstraction for SQL Server.
 Version: 1.1.1
 Author: Anthony Gentile and Elizabeth M Smith
 Author URI: http://wordpress.visitmix.com/
