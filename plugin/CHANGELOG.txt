@@ -1,3 +1,10 @@
+== 1.1.1 10/5/2011 ==
+* additional help for installation, upgrading, and migrating
+* packaged example fields_map file updated to a base 3.2.1 install
+* translation uses N prefix for unicode data
+* DB_COLLATE obeyed properly for table creation
+* better error handling and descriptions for plugin, installation and upgrade issues
+
 == 1.1.0 - 7/21/2011 ==
 
 * New method of stripping out strings before translation
