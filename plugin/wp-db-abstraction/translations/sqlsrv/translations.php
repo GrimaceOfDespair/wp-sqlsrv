@@ -166,6 +166,20 @@ class SQL_Translations extends wpdb
     var $preg_original;
 
     /**
+     * Sets blog id.
+     *
+     * @since 3.0.0
+     * @access public
+     * @param int $blog_id
+     * @param int $site_id Optional.
+     * @return string previous blog id
+     */
+    function set_blog_id( $blog_id, $site_id = 0 ) {
+        $this->fields_map = new Fields_map($blog_id);
+        return parent::set_blog_id($blog_id, $site_id);
+    }
+
+    /**
      * Helper function used with preg_replace_callback to store strings
      * we strip out and replace with a sprintf compatible placeholder
      */
