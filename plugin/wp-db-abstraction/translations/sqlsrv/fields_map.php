@@ -33,12 +33,26 @@ class Fields_map
      *
      * @since 2.7.1
      */
-    function __construct() {
-        $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.php';
+    function __construct($blogid = null) {
+        if (!is_null($blog_id)) {
+            $blog_filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.' . $blogid . '.php';
 
-        // if the file doesn't exist yet, we'll try to write it out and blow up if we can't
-        if (!file_exists($this->filepath)) {
-            $this->update_for('');
+            // if the file doesn't exist, we're going to grab our default file, read it in to get the "base" tables, then set our filepath differently again
+            if (!file_exists($blog_filepath)) {
+                $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.php';
+                $this->read();
+                $this->filepath = $blog_filepath;
+                $this->update_for('');
+            }
+
+            $this->filepath = $blog_filepath;
+        } else {
+            $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.php';
+    
+            // if the file doesn't exist yet, we'll try to write it out and blow up if we can't
+            if (!file_exists($this->filepath)) {
+                $this->update_for('');
+            }
         }
     }
 

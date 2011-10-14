@@ -194,7 +194,13 @@ class SQL_Translations extends wpdb
         $this->preg_original = $query = trim($query);
 
         if (empty($this->fields_map)) {
-            $this->fields_map = new Fields_map();
+            // we have multisite going so we'll use the site specific mapper
+            if ($this->blogid > 1) {
+                $this->fields_map = new Fields_map($this->blogid);
+            } else {
+                $this->fields_map = new Fields_map();
+            }
+            
         }
 
         $this->limit = array();
