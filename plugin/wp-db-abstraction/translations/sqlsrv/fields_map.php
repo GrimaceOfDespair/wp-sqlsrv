@@ -22,8 +22,8 @@ class Fields_map
      * @since 2.7.1
      *
      */
-    function Fields_map() {
-        return $this->__construct();
+    function Fields_map($blogid = null) {
+        return $this->__construct($blogid = null);
     }
 
     /**
@@ -34,7 +34,7 @@ class Fields_map
      * @since 2.7.1
      */
     function __construct($blogid = null) {
-        if (!is_null($blog_id)) {
+        if (!is_null($blogid)) {
             $blog_filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.' . $blogid . '.php';
 
             // if the file doesn't exist, we're going to grab our default file, read it in to get the "base" tables, then set our filepath differently again
