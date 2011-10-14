@@ -124,6 +124,24 @@ class pdo_wpdb extends SQL_Translations {
     }
 
     /**
+     * Set $this->charset and $this->collate
+     *
+     * @since 3.1.0
+     */
+    function init_charset() {
+            if ( function_exists('is_multisite') && is_multisite() ) {
+                    $this->charset = 'utf8';
+                    if ( defined( 'DB_COLLATE' ) && DB_COLLATE )
+                            $this->collate = DB_COLLATE;
+            } elseif ( defined( 'DB_COLLATE' ) ) {
+                    $this->collate = DB_COLLATE;
+            }
+
+            if ( defined( 'DB_CHARSET' ) )
+                    $this->charset = DB_CHARSET;
+    }
+
+    /**
      * Selects a database using the current database connection.
      *
      * The database name will be changed based on the current database
