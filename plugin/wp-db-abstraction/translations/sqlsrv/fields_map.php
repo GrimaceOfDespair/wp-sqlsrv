@@ -34,12 +34,19 @@ class Fields_map
      * @since 2.7.1
      */
     function __construct($blogid = null) {
+        /* Allows a directory for all field maps parsed types files */
+        if (defined('DB_CACHE_LOCATION')) {
+            $loc = DB_CACHE_LOCATION . '/';
+        } else {
+            $loc = '';
+        }
+
         if (!is_null($blogid)) {
-            $blog_filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.' . $blogid . '.php';
+            $blog_filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . $loc . '/fields_map.parsed_types.' . $blogid . '.php';
 
             // if the file doesn't exist, we're going to grab our default file, read it in to get the "base" tables, then set our filepath differently again
             if (!file_exists($blog_filepath)) {
-                $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.php';
+                $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . $loc . '/fields_map.parsed_types.php';
                 $this->read();
                 $this->filepath = $blog_filepath;
                 $this->update_for('');
@@ -47,7 +54,7 @@ class Fields_map
 
             $this->filepath = $blog_filepath;
         } else {
-            $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . '/fields_map.parsed_types.php';
+            $this->filepath = trim(str_replace('mu-plugins/wp-db-abstraction/translations/sqlsrv', '', strtr(dirname(__FILE__), '\\', '/')), '/') . $loc . '/fields_map.parsed_types.php';
     
             // if the file doesn't exist yet, we'll try to write it out and blow up if we can't
             if (!file_exists($this->filepath)) {
