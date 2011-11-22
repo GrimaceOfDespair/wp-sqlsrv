@@ -22,9 +22,9 @@ the Plugin Administration area of your wordpress site.</p>
     <li>Download the latest version of the plugin from <a
     href="http://wordpress.org/extend/plugins/wordpress-database-abstraction/">the
     plugin directory</a></li>
-    <li>Unzip the files<li>
+    <li>Unzip the files</li>
     <li>Find your wp-content folder. The default location is wordpress/wp-content
-    Make sure this directory is writeable by your webserver<li>
+    Make sure this directory is writeable by your webserver</li>
     <li>Put the wp-db-abstraction directory and the wp-db-abstraction.php that
     you unzipped into wp-content/mu-plugins If the mu-plugins directory does not
     exist, please create it first. It should be parallel to your "themes" and
