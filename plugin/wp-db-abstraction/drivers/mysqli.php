@@ -27,6 +27,37 @@
 class mysqli_wpdb extends wpdb {
 
     /**
+     * Connects to the database server and selects a database
+     *
+     * PHP5 style constructor for compatibility with PHP5. Does
+     * the actual setting up of the class properties and connection
+     * to the database.
+     *
+     * @link http://core.trac.wordpress.org/ticket/3354
+     * @since 2.0.8
+     *
+     * @param string $dbuser MySQL database user
+     * @param string $dbpassword MySQL database password
+     * @param string $dbname MySQL database name
+     * @param string $dbhost MySQL database host
+     */
+    function __construct( $dbuser, $dbpassword, $dbname, $dbhost ) {
+        if(!extension_loaded('mysqli')) {
+            $this->bail('
+<h1>Extension Not Loaded</h1>
+<p>The mysqli PHP extension is not loaded properly or available for PHP to use.</p>
+<ul>
+<li>Check your phpinfo</li>
+<li>Make sure it is loaded in your php ini file</li>
+<li>Turn on display_errors and display_startup_errors so you can detect issues with loading the module.</li>
+</ul>');
+            return;
+        }
+
+        parent::__construct( $dbuser, $dbpassword, $dbname, $dbhost );
+    }
+
+    /**
      * Sets the connection's character set.
      *
      * @since 3.1.0

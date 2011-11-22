@@ -92,6 +92,31 @@ class pdo_wpdb extends SQL_Translations {
      */
     function __construct( $dbuser, $dbpassword, $dbname, $dbhost, $pdo_type ) {
         $this->pdo_type = $pdo_type;
+
+        if(!extension_loaded('pdo')) {
+            $this->bail('
+<h1>Extension Not Loaded</h1>
+<p>The pdo PHP extension is not loaded properly or available for PHP to use.</p>
+<ul>
+<li>Check your phpinfo</li>
+<li>Make sure it is loaded in your php ini file</li>
+<li>Turn on display_errors and display_startup_errors so you can detect issues with loading the module.</li>
+</ul>');
+            return;
+        }
+
+        if(!in_array($this->pdo_type, pdo_drivers())) {
+            $this->bail('
+<h1>PDO Driver Not Loaded</h1>
+<p>The pdo PHP driver extension ' . $this->pdo_type . ' is not loaded properly or available for PHP to use.</p>
+<ul>
+<li>Check your phpinfo</li>
+<li>Make sure it is loaded in your php ini file</li>
+<li>Turn on display_errors and display_startup_errors so you can detect issues with loading the module.</li>
+</ul>');
+            return;
+        }
+
         parent::__construct( $dbuser, $dbpassword, $dbname, $dbhost);
     }
 
