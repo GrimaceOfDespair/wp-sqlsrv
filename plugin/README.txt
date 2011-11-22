@@ -1,83 +1,185 @@
-WordPress for SQL Server Patch has become WordPress Database Abstraction Plugin
+=== Plugin Name ===
+Contributors: omniti
+Tags: database abstraction, mssql, pdo, SQL Server, sqlsrv, pdo_mysql, pdo_sqlsrv, mysqli, database
+Requires at least: 3.0
+Tested up to: 3.2.1
+Stable tag: 1.1.2
 
-Database Abstraction?  Isn't this only for SQL Server and Azure?
+This plugin provides db access abstraction and SQL dialect abstraction for SQL Server.
+It is an mu (Must-Use) plugin AND also a db.php drop-in.
 
-The WordPress Database Abstraction Plugin provides two things - database access abstraction
-and SQL dialect abstraction.  What does that mean?
+== Description ==
 
-1. Database Access Abstraction is the way you connect to the database through PHP.
-This plugin allows mysql, pdo, sqlsrv or mssql extensions to be used.  This allows
+WP Database Abstraction is a plugin to make it possible to run WP on top of MS
+SQL Server or Azure and provides two features, database access abstraction and SQL
+dialect abstraction. This plugin cannot be installed or used as a regular
+plugin, it must be in the "mu-plugins" directory (must use plugins) and in
+addition to the plugin it contains a "drop-in" to hook into WordPress Database
+functionality.
+
+Database Access Abstraction is the way you connect to the database through PHP.
+This plugin allows mysql, mysqli, pdo, sqlsrv or mssql extensions to be used.  PDO has support
+for mssql, dblib, sqlsrv and mysql drivers.  This allows
 you to choose the way your WordPress installation connects to your database.  You
 can use the plugin and still use a Mysql Database, which is perfect if your hosting
-provider only has PDO with the mysql driver available.  The flexible structure of the
+provider does not make the mysql extension available.  The flexible structure of the
 plugin means that dropping in additional drivers is easy.
 
-2. SQL dialect abstraction means translating from the dialect understood by Mysql
+SQL dialect abstraction means translating from the dialect understood by Mysql
 to other dialects.  Currently only translation layers for T-SQL (used by Azure and SQL Server)
 are provided.  However this is an open source project and additional translation layers
 could be added.
 
-Which package is right for me?
+For help and support please see the sourceforge project
+http://sourceforge.net/projects/wp-sqlsrv/
 
-1. I want to upgrade an existing site running the Wordpress for SQL Server Patch -
-      Download the distribution/wp-db-abstraction.zip - this is a full install of
-      the latest version of Wordpress with the plugin and drop in files in place and
-      ready to use.
+For information and tutorials please visit our blog
+http://wordpress.visitmix.com/
 
-2. I want to install a new site on SQL Server or Azure -
-      Download the distribution/wp-db-abstraction.zip - this is a full install of
-      the latest version of Wordpress with the plugin and drop in files in place and
-      ready to use.
+== Installation ==
 
-3. I am a WordPress expert and want to control how the plugin is installed -
-      Download the plugin/wp-db-abstraction.zip - this contains only the plugin
-      files and will require manual installation into the mu-plugins folder, and db.php
-      will need to be copied into the correct location.  This is for WordPress experts.
+For a new WordPress install - you cannot install WordPress using SQL Server until
+the plugin and dropin are in place.
 
-What does this change - from patch to plugin - mean?
+1. Download the plugin package.
+1. Upload wp-db-abstraction.php and the wp-db-abstraction directory to wp-content/mu-plugins.  This should be parallel to your regular plugins directory.  If the mu-plugins directory does not exist, you must create it.
+1. Put the db.php file from inside the wp-db-abstraction.php directory to wp-content/db.php
+1. Visit $your_wordpress_url/wp-content/mu-plugins/wp-db-abstraction/setup-config.php to generate your wp-config.php file
+1. Install WordPress normally
 
-1. Your site will run just as it always has, the files are just in a different location.
+For a Wordpress install already using the plugin:
 
-2. You no longer need a specially patched version of WordPress to run on Sql Server or Azure,
-just use a regular WordPress release, and put the plugin files and drop in file in the correct locations.
+1. Download the plugin package.
+1. Upload wp-db-abstraction.php and the wp-db-abstraction directory to wp-content/mu-plugins replacing the existing files
+1. Put the db.php file from inside the wp-db-abstraction directory to wp-content/db.php
 
-3. You can still update your entire site using a "pre-packaged" version of WordPress with all the plugin files
-in place and ready to go.
+If you are using or intend to use plugins that also use a db.php dropin.
+You MUST make sure the only db.php file in your wp-content directory is the one used by wp database abstraction.
+Rename the db.php files from other plugins.  For example, if you are using a plugin named foobar, rename the
+db.php file from foobar to db-foobar.php and put it in the wp-content directory parallel to the db.php file for
+wp-db-abstraction.  DO NOT OVERWRITE the db.php file that is already present.  Then
+add
 
-4. For new installs - we package our own wp-config.php creator.  The creation url will be at
+include 'db-foobar.php';
+
+to the bottom of the db.php file (there is an example in that file, uncomment it and change the name
+to the name your renamed the other db.php file to)
+
+For a Wordpress Install migrating from MySQL to SQL Server
+
+1. Log into your current site and export your data as an xml file
+1. Disable all your current plugins
+1. Back up your existing config.php file
+1. Download the plugin package.
+1. Upload wp-db-abstraction.php and the wp-db-abstraction directory to wp-content/mu-plugins.  This should be parallel to your regular plugins directory.  If the mu-plugins directory does not exist, you must create it.
+1. Put the db.php file from inside the wp-db-abstraction.php directory to wp-content/db.php
+1. Visit $your_wordpress_url/wp-content/mu-plugins/wp-db-abstraction/setup-config.php to generate your wp-config.php file
+1. Install WordPress
+1. Log into the newly installed system and import your data
+1. Reinstall and test your plugins
+
+If you are using or intend to use plugins that also use a db.php dropin.
+You MUST make sure the only db.php file in your wp-content directory is the one used by wp database abstraction.
+Rename the db.php files from other plugins.  For example, if you are using a plugin named foobar, rename the
+db.php file from foobar to db-foobar.php and put it in the wp-content directory parallel to the db.php file for
+wp-db-abstraction.  DO NOT OVERWRITE the db.php file that is already present.  Then
+add
+
+include 'db-foobar.php';
+
+to the bottom of the db.php file (there is an example in that file, uncomment it and change the name
+to the name your renamed the other db.php file to)
+
+== Frequently Asked Questions ==
+
+= How do I create a wp-config.php file? =
+
+For new installs - we package our own wp-config.php creator.  The creation url will be at
 $your_wordpress_url/wp-content/mu-plugins/wp-db-abstraction/setup-config.php  The original
-setup-config.php WILL be redirected after the second step if db.php is in the right place,
-or you will be automatically redirected (using .htaccess with mod_rewrite or
-web.config urlrewrite rules if your webserver supports it).
+setup-config.php WILL be redirected after the second step if db.php is in the right place
 
-What this does NOT mean
+= My themes and images don't show up when using Multisite with IIS =
+The rewrite rules supplied by wordpress for networking are incorrect for IIS7 and Url Reqwrite
 
-1. You must have the plugin files in place BEFORE installing, and you SHOULD upgrade
-the WordPress Database Abstraction Plugin to a version that supports the version of
-WordPress you want to run BEFORE upgrading WordPress Core.
+change your web.config file and replace the rewrite rule for #5 with the one below
+`<rule name="WordPress Rule 5" stopProcessing="true">
+  <match url="^[_0-9a-zA-Z-]+/(wp-(content|admin|includes).*)" ignoreCase="false" />
+  <action type="Rewrite" url="{R:1}" />
+</rule>`
 
-2. The WordPress Database Abstraction Plugin must be in the mu-plugins folder (that is "must-use" plugins),
-and the special "db.php" drop in file must be in place in the wp-content folder.
-The plugin cannot be downloaded, installed, run or updated as a "regular" plugin.
 
-3. If you are you using other plugins with "db.php" drop ins, you must rename these files
-($pluginname-db.php is a good choice) and add "include '$pluginname-db.php';" to the bottom
-of the WordPress Database Abstraction Plugin's db.php in order to continue using the
-plugin properly.
+= Why is collation important when using SQL Server? How do I change the SQL Server Collation used? =
 
-How do I upgrade from the Patch to the Plugin?
+By default, the SQL Server collation used by this plugin is database_default.  This means
+that the default collation defined by the SQL Server install will dictate the collation
+used when creating the sql server tables.
 
-1. You can "automatically" upgrade using the upgrade mechanism in the patch.  It will
-download the "pre-packaged" version of WordPress with the plugin files in place.
+If you need to use a different collation for your installation, you may define DB_COLLATE
+in your wp-config.php file.  For example, defining it to Cyrillic_General_BIN.  Note that this
+will only affect new installations of the plugin.
 
-2. You can manually upgrade by downloading the lastest version of WordPress, drop the files
-over your existing install, create a "mu-plugins" folder inside the wp-content folder.
+If you want to change the way an individual table is collated you may use the following example syntax:
 
-Download the plugin and unzip it into the mu-plugins folder. You should have a wp-db-abstraction.php file
-and a wp-db-database directory inside mu-plugins.
+`ALTER TABLE wp_posts ALTER COLUMN post_content varchar(max)COLLATE Latin1_General_CI_AS`
 
-Finally copy db.php from wp-content/mu-plugins/wp-db-abstraction/db.php
-to wp-content/db.php.  Do not attempt to use your install before the plugin and db.php
-are in place!
+== Changelog ==
 
-You should not have to change anything in your wp-config.php file.
+== 1.1.2 ==
+* packaged correct example fields_map file updated to a base 3.2.1 install
+* blocked install as anything but mu-plugin
+* fixed error messages for attempted regular plugin install
+* fixed html issues with error page
+* field maps parsed_types information cache can have a location defined in wp-config.php
+* on multisite installs, each site has it's own database metadata cache file
+* added error if PHP database extension desired is not loaded to avoid confusing db can't connect errors
+
+= 1.1.1 =
+* additional help for installation, upgrading, and migrating
+* packaged example fields_map file updated to a base 3.2.1 install
+* translation uses N prefix for unicode data
+* DB_COLLATE obeyed properly for table creation
+* better error handling and descriptions for plugin, installation and upgrade issues
+
+= 1.1.0 =
+* New method of stripping out strings before translation
+* drivers extend sql translation that extends wpdb
+* mysqli driver added
+* Drivers cleaned up and code simplified
+* Issues with sqlsrv and datetime objects, and with integrated windows auth are now fixed
+* Some translation fixes for various plugins
+* API ping is now cached
+* Error if fields_map file cannot be written to
+* Packaged example fields_map file for installations that failed
+
+= 1.0.1 =
+* Fix for USING join for categories
+* mysql driver now simply extends wpdb class
+* pdo driver now provides connection exception information when WP_DEBUG is on
+* Added warning for windows users with ntwdblib and mssql to config setup
+
+= 1.0.0 =
+ * Changed from patch to plugin architecture.
+ * Incorporated several fixes from sourceforge forums in T-SQL dialect translations
+
+== Notes ==
+
+= Known Limitations =
+ * This plugin must be in the "mu-plugins" directory.  The db.php file "drop-in" must be in the wp-content directory.  Normal plugin installation will not work.
+ * Auto-update does not work for must-use plugins
+ * It should be noted that we still hook into the WordPress upgrade logic and provide downstream upgrades
+   through our own API call. This is done so that we can verify that new WordPress versions are compatible
+   with our must-use database abstraction plugin.  As a reminder to current users and as an explanation to
+   new ones, our plugin is an essential part of your blog installation and we want to make sure that when
+   you upgrade WordPress your blog doesn't break.
+ * Some plugins and themes that do not use the WP abstraction layer will break.  This is contrary to WordPress API guidelines, contact the theme or plugin author.
+ * Some plugins and themes may use queries that need additional translations added.  Please report any you find in the forums so the translation files can be updated.
+ * Other plugins may also use a db.php drop-in.  You can use both plugins, but it will requiring renaming files and adding lines
+   to db.php from the plugin.  See the Installation section for more details.
+ * Other plugins that use db.php and extend the db class with custom behavior will break.
+
+= To Do =
+ * Add additional translations for PostgreSQL and Sqlite
+ * Add additional drivers - pdo_sqlite, sqlite, sqlite3, pgsql, pdo_pgsql, odbc, pdo_odbc
+ * Plugin specific autoupdater
+ * Backup and import/export functionality in the plugin
+ * Make db.php smart enough to pick up any files prefixed with db- in the wp-content directory to help with other plugins with "drop-ins"

@@ -1,3 +1,12 @@
+== 1.1.2 11/22/2011 ==
+* packaged correct example fields_map file updated to a base 3.2.1 install
+* blocked install as anything but mu-plugin
+* fixed error messages for attempted regular plugin install
+* fixed html issues with error page
+* field maps parsed_types information cache can have a location defined in wp-config.php
+* on multisite installs, each site has it's own database metadata cache file
+* added error if PHP database extension desired is not loaded to avoid confusing db can't connect errors
+
 == 1.1.1 10/5/2011 ==
 * additional help for installation, upgrading, and migrating
 * packaged example fields_map file updated to a base 3.2.1 install
