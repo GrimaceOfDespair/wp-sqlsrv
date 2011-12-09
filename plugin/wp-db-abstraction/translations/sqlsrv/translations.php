@@ -760,7 +760,7 @@ class SQL_Translations extends wpdb
      */
     function translate_distinct_orderby($query)
     {
-        if ( stripos($query, 'DISTINCT') > 0 ) {
+        if (preg_match('/^\s*SELECT\s*DISTINCT/i', $query)) {
             if ( stripos($query, 'ORDER') > 0 ) {
                 $ord = '';
                 $order_pos = stripos($query, 'ORDER');
@@ -899,7 +899,7 @@ class SQL_Translations extends wpdb
         // Fixed query for archives widgets.
         $query = str_ireplace(
             'GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY post_date DESC',
-            'GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY month DESC, year DESC',
+            'GROUP BY YEAR(post_date), MONTH(post_date) ORDER BY year DESC, month DESC',
             $query
         );
         return $query;
