@@ -2,6 +2,68 @@
   '' => 
   array (
   ),
+  'wp_users' => 
+  array (
+    'ID' => 
+    array (
+      'type' => 'primary_id',
+    ),
+    'display_name' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'user_activation_key' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'user_email' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'user_login' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'user_nicename' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'user_pass' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'user_registered' => 
+    array (
+      'type' => 'date',
+    ),
+    'user_status' => 
+    array (
+      'type' => 'int',
+    ),
+    'user_url' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+  ),
+  'wp_usermeta' => 
+  array (
+    'meta_key' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'meta_value' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'umeta_id' => 
+    array (
+      'type' => 'primary_id',
+    ),
+    'user_id' => 
+    array (
+      'type' => 'int',
+    ),
+  ),
   'wp_terms' => 
   array (
     'name' => 
@@ -335,68 +397,6 @@
     'to_ping' => 
     array (
       'type' => 'nvarchar',
-    ),
-  ),
-  'wp_users' => 
-  array (
-    'ID' => 
-    array (
-      'type' => 'primary_id',
-    ),
-    'display_name' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-    'user_activation_key' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-    'user_email' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-    'user_login' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-    'user_nicename' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-    'user_pass' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-    'user_registered' => 
-    array (
-      'type' => 'date',
-    ),
-    'user_status' => 
-    array (
-      'type' => 'int',
-    ),
-    'user_url' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-  ),
-  'wp_usermeta' => 
-  array (
-    'meta_key' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-    'meta_value' => 
-    array (
-      'type' => 'nvarchar',
-    ),
-    'umeta_id' => 
-    array (
-      'type' => 'primary_id',
-    ),
-    'user_id' => 
-    array (
-      'type' => 'int',
     ),
   ),
 )
