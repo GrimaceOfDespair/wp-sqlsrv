@@ -1,3 +1,7 @@
+== 1.1.3 12/23/2011 ==
+* fixed ording for items in archives
+* added extra space before N prefix in strings to fix bad concatenation issues
+
 == 1.1.2 11/22/2011 ==
 * packaged correct example fields_map file updated to a base 3.2.1 install
 * blocked install as anything but mu-plugin

@@ -3,7 +3,7 @@
 Plugin Name: WP Db Abstraction
 Plugin URI:  http://wordpress.org/extend/plugins/wordpress-database-abstraction/
 Description: Database class drop in override file for WP Db Abstraction plugin
-Version: 1.1.2
+Version: 1.1.3
 Author: Anthony Gentile and Elizabeth M Smith
 Author URI:  http://wordpress.visitmix.com/
 License: GPLv2
