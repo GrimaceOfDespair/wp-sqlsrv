@@ -2,8 +2,8 @@
 Contributors: omniti
 Tags: database abstraction, mssql, pdo, SQL Server, sqlsrv, pdo_mysql, pdo_sqlsrv, mysqli, database
 Requires at least: 3.0
-Tested up to: 3.2.1
-Stable tag: 1.1.2
+Tested up to: 3.3
+Stable tag: 1.1.3
 
 This plugin provides db access abstraction and SQL dialect abstraction for SQL Server.
 It is an mu (Must-Use) plugin AND also a db.php drop-in.
@@ -99,7 +99,7 @@ $your_wordpress_url/wp-content/mu-plugins/wp-db-abstraction/setup-config.php  Th
 setup-config.php WILL be redirected after the second step if db.php is in the right place
 
 = My themes and images don't show up when using Multisite with IIS =
-The rewrite rules supplied by wordpress for networking are incorrect for IIS7 and Url Reqwrite
+The rewrite rules supplied by wordpress for networking are incorrect for IIS7 and Url Rewrite
 
 change your web.config file and replace the rewrite rule for #5 with the one below
 `<rule name="WordPress Rule 5" stopProcessing="true">
@@ -124,7 +124,11 @@ If you want to change the way an individual table is collated you may use the fo
 
 == Changelog ==
 
-== 1.1.2 ==
+= 1.1.3 =
+* fixed ording for items in archives
+* added extra space before N prefix in strings to fix bad concatenation issues
+
+= 1.1.2 =
 * packaged correct example fields_map file updated to a base 3.2.1 install
 * blocked install as anything but mu-plugin
 * fixed error messages for attempted regular plugin install
@@ -166,13 +170,8 @@ If you want to change the way an individual table is collated you may use the fo
 = Known Limitations =
  * This plugin must be in the "mu-plugins" directory.  The db.php file "drop-in" must be in the wp-content directory.  Normal plugin installation will not work.
  * Auto-update does not work for must-use plugins
- * It should be noted that we still hook into the WordPress upgrade logic and provide downstream upgrades
-   through our own API call. This is done so that we can verify that new WordPress versions are compatible
-   with our must-use database abstraction plugin.  As a reminder to current users and as an explanation to
-   new ones, our plugin is an essential part of your blog installation and we want to make sure that when
-   you upgrade WordPress your blog doesn't break.
  * Some plugins and themes that do not use the WP abstraction layer will break.  This is contrary to WordPress API guidelines, contact the theme or plugin author.
- * Some plugins and themes may use queries that need additional translations added.  Please report any you find in the forums so the translation files can be updated.
+ * Some plugins and themes may use queries that need additional translations added.  Please report any you find in the sourceforge forums so the translation files can be updated. Please turn on query logging in wp-config.php and include your logs with the translation fix request.
  * Other plugins may also use a db.php drop-in.  You can use both plugins, but it will requiring renaming files and adding lines
    to db.php from the plugin.  See the Installation section for more details.
  * Other plugins that use db.php and extend the db class with custom behavior will break.
@@ -180,6 +179,7 @@ If you want to change the way an individual table is collated you may use the fo
 = To Do =
  * Add additional translations for PostgreSQL and Sqlite
  * Add additional drivers - pdo_sqlite, sqlite, sqlite3, pgsql, pdo_pgsql, odbc, pdo_odbc
- * Plugin specific autoupdater
- * Backup and import/export functionality in the plugin
+ * Plugin specific autoupdater to mimic upgrade behavior of regular plugins
+ * Administration area with the ability to view, alter, edit configuration and help with debugging issues
  * Make db.php smart enough to pick up any files prefixed with db- in the wp-content directory to help with other plugins with "drop-ins"
+ * Proper error handling (no more @symbols) in database driver classes

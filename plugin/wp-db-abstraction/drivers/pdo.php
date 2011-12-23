@@ -298,7 +298,7 @@ class pdo_wpdb extends SQL_Translations {
             $flag = '';
         }
         if ($this->pdo_type == 'sqlsrv') {
-            $prefix = 'N';
+            $prefix = ' N';
         } else {
             $prefix = '';
         }
