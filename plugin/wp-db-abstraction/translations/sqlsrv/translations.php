@@ -500,7 +500,7 @@ class SQL_Translations extends wpdb
         }
         
         // Turn on IDENTITY_INSERT for Importing inserts or category/tag adds that are 
-        // trying to explicitly set and IDENTITY column
+        // trying to explicitly set an IDENTITY column
         if ($this->insert_query) {
             $tables = array(
                 $this->get_blog_prefix() . 'posts' => 'id', 
@@ -954,6 +954,50 @@ class SQL_Translations extends wpdb
                     }
                 }
                 $this->preg_data[$df['pos']] = $v;
+            }
+        }
+ 
+        return $query;
+    }
+
+    /**
+     * When INSERTING into an identity column - DEFAULT and NULL should be used
+     * the identity column will be stripped out of the query
+     *
+     * @param string $query Query coming in
+     *
+     * @return string Translated Query
+     */
+    function translate_insert_identitynull($query)
+    {
+
+        if ( !$this->insert_query ) {
+            return $query;
+        }
+
+        // find the primary_id field for the table
+        $first_paren = stripos($query, '(', 11) + 1;
+        $last_paren = $this->get_matching_paren($query, $first_paren);
+        $fields = explode(',',substr($query, $first_paren, ($last_paren - $first_paren)));
+        $identity_field = null;
+        $identity_fields_map = $this->fields_map->by_type('primary_id');
+        foreach ($fields as $key => $field ) {
+            $field = trim($field);
+
+            if ( in_array($field, $identity_fields_map) ) {
+               $identity_field = array('pos' => $key + 1, 'field' => $field); // increment position because preg_data is 1 indexed
+
+                // so we have an identity field, let's see if it has NULL or DEFAULT inserted
+                $value = trim($this->preg_data[$identity_field['pos']]);
+
+                if (stripos($value, 'NULL') === 0 ||
+                    stripos($value, 'DEFAULT') === 0) {
+                    // remove column from query
+                    $query = str_replace($identity_field['field'] . ',', '', $query);
+                    // remove preg replacement from query
+                    $query = str_replace('%' . $identity_field['pos'] . '$s,', '', $query);
+                    // note we don't remove the preg_data, this is because it will screw up the sprintf later on if we do
+                }
             }
         }
  
