@@ -166,6 +166,43 @@ class SQL_Translations extends wpdb
     var $preg_original;
 
     /**
+     * Reserved words in t-sql
+     */
+    var $reserved_words = array('add', 'exists', 'precision', 'all', 'exit', 'primary', 'alter',
+                                'external', 'print', 'and', 'fetch', 'proc', 'any', 'file',
+                                'procedure', 'as', 'fillfactor', 'public', 'asc', 'for', 'raiserror',
+                                'authorization', 'foreign', 'read', 'backup', 'freetext', 'readtext',
+                                'begin', 'freetexttable', 'reconfigure', 'between', 'from', 'references',
+                                'break', 'full', 'replication', 'browse', 'function',
+                                'restore', 'bulk', 'goto', 'restrict', 'by', 'grant', 'return',
+                                'cascade', 'group', 'revert', 'case', 'having', 'revoke',
+                                'check', 'holdlock', 'right', 'checkpoint', 'identity',
+                                'rollback', 'close', 'identity_insert', 'rowcount',
+                                'clustered', 'identitycol', 'rowguidcol', 'coalesce',
+                                'if', 'rule', 'collate', 'in', 'save', 'column', 'index',
+                                'schema', 'commit', 'inner', 'securityaudit', 'compute',
+                                'insert', 'select', 'constraint', 'intersect', 'session_user',
+                                'contains', 'into', 'set', 'containstable', 'is', 'setuser',
+                                'continue', 'join', 'shutdown', 'convert', 'key', 'some',
+                                'create', 'kill', 'statistics', 'cross', 'left', 'system_user',
+                                'current', 'like', 'table', 'current_date', 'lineno',
+                                'tablesample', 'current_time', 'load', 'textsize',
+                                'current_timestamp', 'merge', 'then', 'current_user',
+                                'national', 'to', 'cursor', 'nocheck', 'top',
+                                'database', 'nonclustered', 'tran', 'dbcc', 'not',
+                                'transaction', 'deallocate', 'null', 'trigger', 'declare',
+                                'nullif', 'truncate', 'default', 'of', 'tsequal', 'delete',
+                                'off', 'union', 'deny', 'offsets', 'unique', 'desc',
+                                'on', 'unpivot', 'disk', 'open', 'update', 'distinct',
+                                'opendatasource', 'updatetext', 'distributed', 'openquery',
+                                'use', 'double', 'openrowset', 'user', 'drop', 'openxml',
+                                'values', 'dump', 'option', 'varying', 'else', 'or',
+                                'view', 'end', 'order', 'waitfor', 'errlvl', 'outer',
+                                'when', 'escape', 'over', 'where', 'except', 'percent',
+                                'while', 'exec', 'pivot', 'with', 'execute', 'plan',
+                                'writetext');
+
+    /**
      * Sets blog id.
      *
      * @since 3.0.0
@@ -348,6 +385,11 @@ class SQL_Translations extends wpdb
         if ( stripos($query, 'show tables like ') === 0 ) {
             $end_pos = strlen($query);
             $param = substr($query, 17, $end_pos - 17);
+            // quoted with double quotes instead of single?
+            $param = trim($param, '"');
+            if($param[0] !== "'") {
+                $param = "'$param'";
+            }
             $query = 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE ' . $param;
         }
         // DESCRIBE - this is pretty darn close to mysql equiv, however it will need to have a flag to modify the result set
@@ -1201,14 +1243,13 @@ class SQL_Translations extends wpdb
             $table_pos = stripos($query, ' TABLE ') + 6;
             $table = substr($query, $table_pos, stripos($query, '(', $table_pos) - $table_pos);
             $table = trim($table);
-            
-            $reserved_words = array('public');
+
             // get column names to check for reserved words to encapsulate with [ ]
             foreach($this->fields_map->read() as $table_name => $table_fields) {
                 if ($table_name == $table && is_array($table_fields)) {
                     foreach ($table_fields as $field => $field_meta) {
-                        if (in_array($field, $reserved_words)) {
-                            $query = str_ireplace($field, "[{$field}]", $query);
+                        if (in_array($field, $this->reserved_words)) {
+                            $query = preg_replace('/(?<!NOT NULL)\s(' . $field . ')/', "[{$field}]", $query);
                         }
                     }
                 }

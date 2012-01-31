@@ -2,8 +2,8 @@
 Contributors: omniti
 Tags: database abstraction, mssql, pdo, SQL Server, sqlsrv, pdo_mysql, pdo_sqlsrv, mysqli, database
 Requires at least: 3.0
-Tested up to: 3.3
-Stable tag: 1.1.3
+Tested up to: 3.3.1
+Stable tag: 1.1.4
 
 This plugin provides db access abstraction and SQL dialect abstraction for SQL Server.
 It is an mu (Must-Use) plugin AND also a db.php drop-in.
@@ -38,9 +38,30 @@ http://wordpress.visitmix.com/
 
 == Installation ==
 
+Before you begin you will need a properly configuration server and PHP installation.
+For help with IIS you can visit http://php.iis.net/ and ask questions in the forums.
+You will also need a working database extension.  Check your phpinfo page to verify:
+
+To use mysql you will need one of the following php extensions enabled:
+
+1. mysql
+1. mysqli
+1. pdo and pdo_mysql driver
+
+To use sql server you will need one of the following php extensions enabled:
+
+1. sqlsrv
+1. pdo and pdo_sqlsrv driver
+1. mssql (non-windows environments with freetds)
+1. pdo and pdo_dblib (non-windows environments with freetds)
+
+You can get more information and support for sql server and the sqlsrv extension
+at http://social.technet.microsoft.com/Forums/en-US/sqldriverforphp/threads
+
 For a new WordPress install - you cannot install WordPress using SQL Server until
 the plugin and dropin are in place.
 
+1. Download wordpress, unzip the package and put the file in place.
 1. Download the plugin package.
 1. Upload wp-db-abstraction.php and the wp-db-abstraction directory to wp-content/mu-plugins.  This should be parallel to your regular plugins directory.  If the mu-plugins directory does not exist, you must create it.
 1. Put the db.php file from inside the wp-db-abstraction.php directory to wp-content/db.php
@@ -123,6 +144,11 @@ If you want to change the way an individual table is collated you may use the fo
 `ALTER TABLE wp_posts ALTER COLUMN post_content varchar(max)COLLATE Latin1_General_CI_AS`
 
 == Changelog ==
+
+= 1.1.4 =
+* add all reserved words for sql server - plugins might use them
+* fixed limit regex to catch queries with ; at the end
+* fix for inserting NULL into identity columns
 
 = 1.1.3 =
 * fixed ording for items in archives
