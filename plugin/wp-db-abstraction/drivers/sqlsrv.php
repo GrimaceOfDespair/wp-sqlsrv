@@ -348,6 +348,12 @@ class sqlsrv_wpdb extends SQL_Translations {
 
         // Make sure textsize fields are set to max.
         @sqlsrv_query('SET TEXTSIZE 2147483647');
+        
+        // Allow for datetime to be interpreted by wordpress due to the way in
+        // which mssql formats datetime. The format of course can be changed
+        // within wordpress itself later to correspond to the preferred date format.
+        // See: https://wordpress.org/support/topic/fresh-wp-35-install-not-compatible
+        @sqlsrv_query($this->dbh,'SET DATEFORMAT ymd');
 
         $this->ready = true;
     }
