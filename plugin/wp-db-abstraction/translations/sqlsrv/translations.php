@@ -270,7 +270,7 @@ class SQL_Translations extends wpdb
         }
 
         // strip out any quoted strings and store them, replace with sprintf placeholders
-        $query = preg_replace_callback("!'([^'\\\]*(\\\'[^'\\\]*)*)'!", array($this, 'strip_strings'), $query);
+        $query = preg_replace_callback("!'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'!", array($this, 'strip_strings'), $query);
         $this->preg_location = 1;
 
         // Do we have serialized arguments?
@@ -531,6 +531,20 @@ class SQL_Translations extends wpdb
             $query = preg_replace('/(ORDER BY RAND\(\))(.*)$/i', 'ORDER BY NEWID()\2', $query);
         }
 
+        // Replace ORDER BY FIELD with CASE
+        if (preg_match('/(ORDER BY FIELD\( ([^,]+), ([^,]+)(,[^,]+)* \))/i', $query)) {
+            $query = preg_replace_callback('/(ORDER BY FIELD\( ([^,]+), ([^,]+)(,[^,]+)* \))/i',
+            function ($matches) {
+              $orderBy = "ORDER BY CASE(" . $matches[2] . ") ";
+              $i = 1;
+              for ($i = 3; $i < count($matches); $i++) {
+                $match = trim($matches[$i], ',');
+                $orderBy .= "WHEN '$match' THEN $i ";
+              }
+              return $orderBy . "END;";
+            }, $query);
+        }
+
         // Remove uncessary ORDER BY clauses as ORDER BY fields needs to 
         // be contained in either an aggregate function or the GROUP BY clause.
         // something that isn't enforced in mysql
@@ -723,7 +737,8 @@ class SQL_Translations extends wpdb
             && (stripos($query,'UPDATE') !== 0  && stripos($query,'UPDATE') !== FALSE) ) {
             return $query;
         }
-        $pattern = '/LIMIT\s*(\d+)((\s*,?\s*)(\d+)*)(;{0,1})$/is';
+        $pattern = '/LIMIT\s*(\d+)((\s*,?\s*)(\d+)*);{0,1}$/is';
+        
         $matched = preg_match($pattern, $query, $limit_matches);
         if ( $matched == 0 ) {
             return $query;
@@ -734,10 +749,10 @@ class SQL_Translations extends wpdb
         if ( $this->delete_query ) {
             return $query;
         }
-        // Check for true offset
+        //   offset
         if ( count($limit_matches) == 5 && $limit_matches[1] != '0' ) {
             $true_offset = true;
-        } elseif ( count($limit_matches) == 5 && $limit_matches[1] == '0' ) {
+        } elseif ( count($limit_matches) >= 5 && $limit_matches[1] == '0' ) {
             $limit_matches[1] = $limit_matches[4];
         }
 
