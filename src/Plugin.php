@@ -1,12 +1,12 @@
 <?php
 
-namespace GrimaceOfDespair;
+namespace GrimaceOfDespair\WpSqlSrv;
 
 use Composer\Script\Event;
 
-class WpSqlSrv
+class Plugin
 {
-    public static function copyPlugin(Event $event)
+    public static function copy(Event $event)
     {
         $composer = $event->getComposer();
         
