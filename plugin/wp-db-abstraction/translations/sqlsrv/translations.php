@@ -559,6 +559,7 @@ class SQL_Translations extends wpdb
         // trying to explicitly set an IDENTITY column
         if ($this->insert_query) {
             $tables = array(
+                $this->get_blog_prefix() . 'blogs' => 'blog_id', 
                 $this->get_blog_prefix() . 'posts' => 'id', 
                 $this->get_blog_prefix() . 'terms' => 'term_id', 
             );
