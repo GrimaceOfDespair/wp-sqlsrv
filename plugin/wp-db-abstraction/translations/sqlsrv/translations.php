@@ -224,7 +224,7 @@ class SQL_Translations extends wpdb
     {
         $location = $this->preg_location;
         $this->preg_location++;
-        $this->preg_data[$location] = $matches[0]; // store with quotes
+        $this->preg_data[$location] = str_replace('\\', '', $matches[0]); // store with quotes
         $string = '%' . $location . '$s';
 
         return $string;
