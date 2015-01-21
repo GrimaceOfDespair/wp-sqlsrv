@@ -386,8 +386,8 @@ class SQL_Translations extends wpdb
             $end_pos = strlen($query);
             $param = substr($query, 17, $end_pos - 17);
             // quoted with double quotes instead of single?
-            $param = trim($param, '"');
-            if($param[0] !== "'") {
+            $param = trim($param, '" ');
+            if (!preg_match('/[N\']/', $param)) {
                 $param = "'$param'";
             }
             $query = 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE ' . $param;
