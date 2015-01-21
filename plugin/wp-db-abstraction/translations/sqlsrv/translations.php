@@ -1000,7 +1000,10 @@ class SQL_Translations extends wpdb
         if ( count($date_fields) > 0 ) {
             // values are in the preg_data array, we'll fix them there
             foreach ( $date_fields as $df ) {
-                $v = $this->preg_data[$df['pos']];
+                $dfpos = $df['pos'];
+                if (!isset($this->preg_data[$dfpos])) continue;
+                
+                $v = $this->preg_data[$dfpos];
                 $quote = ( stripos($v, "'0000-00-00 00:00:00'") === 0 || $v === "''" ) ? "'" : '';
                 if ( stripos($v, '0000-00-00 00:00:00') === 0
                     || stripos($v, "'0000-00-00 00:00:00'") === 0
