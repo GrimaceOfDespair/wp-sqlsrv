@@ -74,7 +74,7 @@ class Fields_map
      */
     function by_type($type, $table = null) {
         $ret = array();
-        foreach ($this->fields_map as $tables => $fields) {
+        foreach ($this->read() as $tables => $fields) {
             if ( is_array($fields) ) {
                 foreach ($fields as $field_name => $field_meta) {
                     if ( $field_meta['type'] == $type ) {
