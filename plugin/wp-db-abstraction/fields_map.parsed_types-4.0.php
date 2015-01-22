@@ -268,10 +268,6 @@
     array (
       'type' => 'nvarchar',
     ),
-    'blog_id' => 
-    array (
-      'type' => 'int',
-    ),
     'option_id' => 
     array (
       'type' => 'primary_id',
@@ -398,6 +394,221 @@
     array (
       'type' => 'nvarchar',
     ),
+  ),
+  'wp_blogs' => 
+  array (
+    'archived' => 
+    array (
+      'type' => 'int',
+    ),
+    'blog_id' => 
+    array (
+      'type' => 'primary_id',
+    ),
+    'deleted' => 
+    array (
+      'type' => 'int',
+    ),
+    'domain' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'lang_id' => 
+    array (
+      'type' => 'int',
+    ),
+    'last_updated' => 
+    array (
+      'type' => 'date',
+    ),
+    'mature' => 
+    array (
+      'type' => 'int',
+    ),
+    'path' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'public' => 
+    array (
+      'type' => 'int',
+    ),
+    'registered' => 
+    array (
+      'type' => 'date',
+    ),
+    'site_id' => 
+    array (
+      'type' => 'int',
+    ),
+    'spam' => 
+    array (
+      'type' => 'int',
+    ),
+  ),
+  'wp_blog_versions' => 
+  array (
+    'blog_id' => 
+    array (
+      'type' => 'primary_id',
+    ),
+    'db_version' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'last_updated' => 
+    array (
+      'type' => 'date',
+    ),
+  ),
+  'wp_registration_log' => 
+  array (
+    'ID' => 
+    array (
+      'type' => 'primary_id',
+    ),
+    'IP' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'blog_id' => 
+    array (
+      'type' => 'int',
+    ),
+    'date_registered' => 
+    array (
+      'type' => 'date',
+    ),
+    'email' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+  ),
+  'wp_site' => 
+  array (
+    'domain' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'id' => 
+    array (
+      'type' => 'primary_id',
+    ),
+    'path' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+  ),
+  'wp_sitemeta' => 
+  array (
+    'meta_id' => 
+    array (
+      'type' => 'primary_id',
+    ),
+    'meta_key' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'meta_value' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'site_id' => 
+    array (
+      'type' => 'int',
+    ),
+  ),
+  'wp_signups' => 
+  array (
+    'activated' => 
+    array (
+      'type' => 'date',
+    ),
+    'activation_key' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'active' => 
+    array (
+      'type' => 'int',
+    ),
+    'domain' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'meta' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'path' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'registered' => 
+    array (
+      'type' => 'date',
+    ),
+    'signup_id' => 
+    array (
+      'type' => 'primary_id',
+    ),
+    'title' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'user_email' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+    'user_login' => 
+    array (
+      'type' => 'nvarchar',
+    ),
+  ),
+  'wp_users ADD KEY user_login_key' => 
+  array (
+  ),
+  'wp_users ADD KEY user_nicename' => 
+  array (
+  ),
+  'wp_usermeta ADD KEY user_id' => 
+  array (
+  ),
+  'wp_usermeta ADD KEY meta_key' => 
+  array (
+  ),
+  'wp_blogs ADD KEY domain' => 
+  array (
+  ),
+  'wp_blogs ADD KEY lang_id' => 
+  array (
+  ),
+  'wp_blog_versions ADD KEY db_version' => 
+  array (
+  ),
+  'wp_registration_log ADD KEY IP' => 
+  array (
+  ),
+  'wp_site ADD KEY domain' => 
+  array (
+  ),
+  'wp_sitemeta ADD KEY meta_key' => 
+  array (
+  ),
+  'wp_sitemeta ADD KEY site_id' => 
+  array (
+  ),
+  'wp_signups ADD KEY activation_key' => 
+  array (
+  ),
+  'wp_signups ADD KEY user_email' => 
+  array (
+  ),
+  'wp_signups ADD KEY user_login_email' => 
+  array (
+  ),
+  'wp_signups ADD KEY domain_path' => 
+  array (
   ),
 )
  ?>
